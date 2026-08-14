@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Restaurant admin dashboard — overview of today's orders, revenue, and key metrics.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Dashboard — Admin Panel</title>
+
+  <!-- PWA Meta Tags & Manifest -->
+  <link rel="manifest" href="../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WIN Restaurant">
+  <link rel="apple-touch-icon" href="../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand" id="sidebar-brand"><i class="fa-solid fa-utensils"></i> WIN Cafe</div>
+        <div class="sidebar-subtitle">Admin Panel</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="./" class="sidebar-link active">
+          <span class="icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard
+        </a>
+        <a href="menu-manage/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-clipboard-list"></i></span> Menu Management
+        </a>
+        <a href="orders/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-box"></i></span> Order Management
+        </a>
+        <a href="cancellations/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-ban" style="color:var(--clr-error);"></i></span> Cancellations
+        </a>
+        <a href="qr/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-qrcode"></i></span> QR Codes
+        </a>
+        <a href="../kitchen/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-kitchen-set"></i></span> Kitchen Display
+        </a>
+        <a href="../menu/?t=T1" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-mobile-screen"></i></span> Customer View
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn--ghost btn--full btn--sm" id="logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-page-header">
+        <h1 class="admin-page-title"><i class="fa-solid fa-chart-simple"></i> Dashboard</h1>
+        <span style="font-size: var(--fs-sm); color: var(--clr-text-muted);" id="current-date"></span>
+      </div>
+
+      <!-- Cancellation Request Alerts (auto-polled) -->
+      <div id="cancellation-alerts-container" style="margin-bottom:var(--sp-4);"></div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid stagger" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--primary"><i class="fa-solid fa-box"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Today's Orders</span>
+            <span class="stat-value" id="stat-orders">—</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--success"><i class="fa-solid fa-sack-dollar"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Today's Revenue</span>
+            <span class="stat-value" id="stat-revenue">—</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--warning"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Pending Orders</span>
+            <span class="stat-value" id="stat-pending">—</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--info"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Completed</span>
+            <span class="stat-value" id="stat-completed">—</span>
+          </div>
+        </div>
+        <div class="stat-card" style="border-color: hsla(0,75%,55%,0.3);">
+          <div class="stat-icon" style="background:hsla(0,75%,55%,0.12); color:var(--clr-error);"><i
+              class="fa-solid fa-ban"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Cancelled Today</span>
+            <span class="stat-value" id="stat-cancelled">—</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="data-table-wrapper">
+        <div class="data-table-header">
+          <h3><i class="fa-solid fa-clipboard-list"></i> Recent Orders</h3>
+          <div style="display: flex; gap: var(--sp-2);">
+            <button id="download-orders-btn" class="btn btn--primary btn--sm"
+              style="background: linear-gradient(135deg, #107c41, #1f9a55); border: none; box-shadow: none;">
+              <i class="fa-solid fa-file-excel"></i> Download Excel
+            </button>
+            <a href="orders/" class="btn btn--outline btn--sm">View All →</a>
+          </div>
+        </div>
+        <table class="data-table responsive-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Table</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="recent-orders-body">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem; color: var(--clr-text-muted);">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script>
+    // ── Auth guard ──
+    if (!sessionStorage.getItem(CONFIG.STORAGE_KEYS.AUTH)) {
+      window.location.href = 'login/';
+    }
+
+    // ── Elements ──
+    const statOrders = document.getElementById('stat-orders');
+    const statRevenue = document.getElementById('stat-revenue');
+    const statPending = document.getElementById('stat-pending');
+    const statCompleted = document.getElementById('stat-completed');
+    const recentOrdersBody = document.getElementById('recent-orders-body');
+    const currentDate = document.getElementById('current-date');
+    const sidebarBrand = document.getElementById('sidebar-brand');
+
+    // ── Init ──
+    async function init() {
+      // Set date
+      currentDate.textContent = new Date().toLocaleDateString('en-IN', {
+        timeZone: 'Asia/Kolkata', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+
+      // Set restaurant name from session
+      const name = sessionStorage.getItem('restaurant_name');
+      if (name) sidebarBrand.innerHTML = `<i class="fa-solid fa-utensils"></i> ${name}`;
+
+      await loadDashboard();
+      await loadCancellationAlerts();
+
+      // Auto-refresh: dashboard every 30s, cancellation alerts every poll interval
+      setInterval(loadDashboard, 30000);
+      setInterval(loadCancellationAlerts, CONFIG.POLL_INTERVAL * 3);
+    }
+
+    async function loadDashboard() {
+      try {
+        const data = await API.getDashboard();
+
+        // Stats
+        statOrders.textContent = data.todayOrders || 0;
+        statRevenue.textContent = formatPrice(data.totalRevenue || 0);
+        statPending.textContent = data.pendingOrders || 0;
+        statCompleted.textContent = data.completedOrders || 0;
+
+        // Cancellation stats
+        const cancelledEl = document.getElementById('stat-cancelled');
+        const cancelRateEl = document.getElementById('stat-cancel-rate');
+        if (cancelledEl) cancelledEl.textContent = data.cancelledToday || 0;
+        if (cancelRateEl) {
+          const totalOrders = data.todayOrders || 1;
+          const cancelled = data.cancelledToday || 0;
+          const rate = ((cancelled / totalOrders) * 100).toFixed(1);
+          cancelRateEl.textContent = rate + '%';
+        }
+
+        // Recent orders table
+        const orders = data.recentOrders || [];
+        if (orders.length === 0) {
+          recentOrdersBody.innerHTML = `
+            <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--clr-text-muted);">
+              No orders today yet. They'll appear here automatically.
+            </td></tr>
+          `;
+        } else {
+          recentOrdersBody.innerHTML = orders.map(order => {
+            const items = (order.items || []).map(i => `${i.qty}× ${i.name}`).join(', ');
+            const statusClass = order.status.toLowerCase();
+            return `
+              <tr>
+                <td data-label="Order ID"><strong>${order.orderId}</strong></td>
+                <td data-label="Table"><span class="badge badge--primary">${String(order.table).match(/^\d+$/) ? 'T' + order.table : order.table}</span></td>
+                <td data-label="Items" style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${items || '—'}</td>
+                <td data-label="Total"><strong>${formatPrice(order.total)}</strong></td>
+                <td data-label="Status"><span class="badge badge--${getStatusBadge(order.status)}">${order.status}</span></td>
+                <td data-label="Time" style="color: var(--clr-text-muted); font-size: var(--fs-xs);">${formatTime(order.timestamp)}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Dashboard load failed:', err);
+        // Show demo data
+        statOrders.textContent = '12';
+        statRevenue.textContent = formatPrice(8450);
+        statPending.textContent = '3';
+        statCompleted.textContent = '9';
+        // Demo cancellation stats
+        const cancelledEl2 = document.getElementById('stat-cancelled');
+        const cancelRateEl2 = document.getElementById('stat-cancel-rate');
+        if (cancelledEl2) cancelledEl2.textContent = '2';
+        if (cancelRateEl2) cancelRateEl2.textContent = '16.7%';
+        recentOrdersBody.innerHTML = `
+          <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--clr-text-muted);">
+            <i class="fa-solid fa-triangle-exclamation"></i> Could not load data. Check your Google Apps Script URL in config.js
+          </td></tr>
+        `;
+      }
+    }
+
+    function getStatusBadge(status) {
+      const map = { 'New': 'info', 'Accepted': 'primary', 'Preparing': 'warning', 'Ready': 'success', 'Delivered': 'success', 'Paid': 'success', 'Rejected': 'error' };
+      return map[status] || 'info';
+    }
+
+    // ── Excel Export function ──
+    async function downloadTodayOrdersExcel() {
+      const downloadBtn = document.getElementById('download-orders-btn');
+      const originalHtml = downloadBtn.innerHTML;
+      downloadBtn.disabled = true;
+      downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exporting...';
+
+      try {
+        const allOrders = await API.getOrders();
+
+        // Filter for today's orders
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayOrders = allOrders.filter(o => {
+          try {
+            return o.timestamp.split('T')[0] === todayStr;
+          } catch (e) {
+            return false;
+          }
+        });
+
+        if (todayOrders.length === 0) {
+          showToast('No orders found for today.', 'info');
+          return;
+        }
+
+        // Generate CSV content with UTF-8 BOM for Excel support
+        let csvContent = '\uFEFF';
+        const headers = ['Order ID', 'Table', 'Customer Name', 'Mobile Number', 'Items', 'Total Price', 'Status', 'Time', 'Notes'];
+        csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\r\n';
+
+        todayOrders.forEach(o => {
+          const itemsStr = (o.items || []).map(i => `${i.qty}x ${i.name}`).join('; ');
+          const formattedTime = new Date(o.timestamp).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
+          const row = [
+            o.orderId,
+            o.table,
+            o.customerName,
+            o.mobileNumber,
+            itemsStr,
+            o.total,
+            o.status,
+            formattedTime,
+            o.notes
+          ];
+          csvContent += row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(',') + '\r\n';
+        });
+
+        // Trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `orders_${todayStr}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Excel file downloaded successfully!', 'success');
+      } catch (err) {
+        console.error('Excel export failed:', err);
+        showToast('Failed to export orders.', 'error');
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = originalHtml;
+      }
+    }
+
+    // ── Cancellation Request Alerts ──
+    async function loadCancellationAlerts() {
+      const container = document.getElementById('cancellation-alerts-container');
+      if (!container) return;
+      try {
+        const orders = await API.getOrders('Cancellation Requested');
+        if (!orders || orders.length === 0) {
+          container.innerHTML = '';
+          return;
+        }
+        container.innerHTML = orders.map(order => {
+          const tableDisplay = /^\d+$/.test(String(order.table)) ? 'Table ' + order.table : (order.table || 'Unknown');
+          return `
+            <div style="background:hsla(0,75%,55%,0.1); border:1.5px solid hsla(0,75%,55%,0.45); border-radius:var(--radius-md); display:flex; justify-content:space-between; align-items:center; padding:var(--sp-3) var(--sp-4); margin-bottom:var(--sp-3); animation:pulse 2s infinite;">
+              <span style="font-size:var(--fs-sm); font-weight:var(--fw-medium);">
+                <i class="fa-solid fa-triangle-exclamation" style="color:var(--clr-error);"></i>
+                &nbsp;<strong>${tableDisplay}</strong> &mdash; Order <strong>#${order.orderId}</strong> has requested cancellation
+                ${order.cancel_reason ? ' &middot; <em style="color:var(--clr-text-muted); font-weight:normal;">' + order.cancel_reason + '</em>' : ''}
+              </span>
+              <a href="cancellations/" class="btn btn--sm" style="background:var(--clr-error); color:#fff; border:none; flex-shrink:0; margin-left:var(--sp-3);">Review &rarr;</a>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.warn('[Dashboard] Cancellation alerts unavailable:', err.message);
+      }
+    }
+
+    // ── Sidebar toggle (mobile) ──
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      sidebarBackdrop.classList.toggle('active');
+    }
+
+    document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // ── Excel Download Event ──
+    document.getElementById('download-orders-btn').addEventListener('click', downloadTodayOrdersExcel);
+
+    // ── Logout ──
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = 'login/';
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../sw.js', { scope: '../' })
+          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+          .catch(err => console.log('Service Worker registration failed.', err));
+      });
+    }
+  </script>
+  <script src="../../js/notifications.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View and process order cancellation requests Ã¢â‚¬â€ Admin Panel.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Cancellations Ã¢â‚¬â€ Admin Panel</title>
+
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/admin.css">
+  <link rel="stylesheet" href="../../css/payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .cancel-requests-section { margin-bottom: var(--sp-6); }
+    .cancel-requests-header { display:flex; align-items:center; justify-content:space-between; gap:var(--sp-3); margin-bottom:var(--sp-4); }
+    .cancel-requests-title { display:flex; align-items:center; gap:var(--sp-3); font-size:var(--fs-lg); font-weight:var(--fw-bold); color:var(--clr-text-primary); }
+    .pending-badge { background:var(--clr-error); color:#fff; font-size:var(--fs-xs); font-weight:var(--fw-bold); padding:2px 8px; border-radius:var(--radius-full); min-width:20px; text-align:center; animation:pulse-badge 2s ease-in-out infinite; }
+    @keyframes pulse-badge { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.05)} }
+    .cancel-request-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:var(--sp-4); }
+    .cancel-request-card { background:var(--clr-bg-elevated); border:1.5px solid hsla(0,75%,55%,0.35); border-radius:var(--radius-lg); padding:var(--sp-4); position:relative; overflow:hidden; transition:border-color var(--transition-base),box-shadow var(--transition-base); }
+    .cancel-request-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--clr-error),hsl(25,90%,55%)); }
+    .cancel-request-card:hover { border-color:hsla(0,75%,55%,0.6); box-shadow:0 4px 20px hsla(0,75%,55%,0.12); }
+    .cancel-request-card.urgent { border-color:hsla(0,75%,55%,0.7); animation:requestPulse 2.5s ease-in-out infinite; }
+    @keyframes requestPulse { 0%,100%{box-shadow:0 0 0 0 hsla(0,75%,55%,0);} 50%{box-shadow:0 0 0 5px hsla(0,75%,55%,0.18);} }
+    .cancel-request-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:var(--sp-3); }
+    .cancel-request-order-id { font-size:var(--fs-md); font-weight:var(--fw-bold); color:var(--clr-text-primary); }
+    .cancel-request-table { font-size:var(--fs-xs); color:var(--clr-primary); background:hsla(220,90%,60%,0.12); padding:3px 8px; border-radius:var(--radius-full); border:1px solid hsla(220,90%,60%,0.25); }
+    .cancel-request-items { font-size:var(--fs-sm); color:var(--clr-text-secondary); margin-bottom:var(--sp-2); line-height:1.5; }
+    .cancel-request-customer { font-size:var(--fs-xs); color:var(--clr-text-muted); margin-bottom:var(--sp-3); }
+    .cancel-request-total { font-size:var(--fs-md); font-weight:var(--fw-bold); color:var(--clr-text-primary); margin-bottom:var(--sp-3); }
+    .cancel-request-actions { display:flex; gap:var(--sp-2); flex-wrap:wrap; }
+    .btn--cancel-confirm { flex:1; background:linear-gradient(135deg,hsl(0,70%,45%),hsl(0,75%,55%)); color:#fff; border:none; padding:var(--sp-2) var(--sp-4); border-radius:var(--radius-md); font-size:var(--fs-sm); font-weight:var(--fw-semibold); cursor:pointer; transition:all var(--transition-base); display:inline-flex; align-items:center; justify-content:center; gap:var(--sp-2); }
+    .btn--cancel-confirm:hover { filter:brightness(1.1); box-shadow:0 4px 12px hsla(0,75%,55%,0.35); }
+    .cancel-request-time { font-size:var(--fs-xs); color:var(--clr-text-muted); margin-top:var(--sp-2); text-align:right; }
+    .no-requests { text-align:center; padding:var(--sp-8) var(--sp-4); background:var(--clr-bg-elevated); border:1px solid var(--clr-border); border-radius:var(--radius-lg); color:var(--clr-text-muted); }
+    .no-requests-icon { font-size:2.5rem; margin-bottom:var(--sp-3); opacity:0.5; }
+    .no-requests h3 { font-size:var(--fs-md); font-weight:var(--fw-semibold); color:var(--clr-text-secondary); margin:0 0 var(--sp-2); }
+    .no-requests p { font-size:var(--fs-sm); margin:0; }
+    .cancel-summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--sp-4); margin-bottom:var(--sp-6); }
+    .cancel-summary-card { background:var(--clr-bg-elevated); border:1px solid var(--clr-border); border-radius:var(--radius-lg); padding:var(--sp-4); display:flex; align-items:center; gap:var(--sp-3); transition:border-color var(--transition-base); }
+    .cancel-summary-card:hover { border-color:var(--stat-accent,var(--clr-border)); }
+    .cancel-summary-icon { width:44px; height:44px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.2rem; background:var(--stat-bg); color:var(--stat-color); flex-shrink:0; }
+    .cancel-summary-info { display:flex; flex-direction:column; }
+    .cancel-summary-label { font-size:var(--fs-xs); color:var(--clr-text-muted); font-weight:var(--fw-medium); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:2px; }
+    .cancel-summary-value { font-size:var(--fs-xl); font-weight:var(--fw-bold); color:var(--clr-text-primary); line-height:1; }
+    .auto-refresh-note { font-size:var(--fs-xs); color:var(--clr-text-muted); display:flex; align-items:center; gap:var(--sp-2); }
+    .refresh-dot { width:6px; height:6px; border-radius:50%; background:var(--clr-success); animation:pulse 2s infinite; display:inline-block; }
+    .admin-reason-tag { display:inline-flex; align-items:center; gap:4px; font-size:0.65rem; font-weight:var(--fw-semibold); background:hsla(0,75%,55%,0.12); color:var(--clr-error); border:1px solid hsla(0,75%,55%,0.25); border-radius:var(--radius-full); padding:2px 8px; }
+    .admin-badge { display:inline-flex; align-items:center; gap:4px; font-size:0.65rem; font-weight:var(--fw-bold); background:hsla(260,70%,60%,0.12); color:hsl(260,70%,65%); border:1px solid hsla(260,70%,60%,0.25); border-radius:var(--radius-full); padding:2px 8px; }
+    .customer-reason-tag { display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:var(--fw-medium); background:hsla(25,90%,50%,0.1); color:hsl(25,90%,60%); border:1px solid hsla(25,90%,50%,0.3); border-radius:var(--radius-full); padding:3px 10px; }
+    .urgent-badge { display:inline-flex; align-items:center; gap:4px; font-size:0.65rem; font-weight:var(--fw-bold); background:hsla(0,75%,55%,0.12); color:var(--clr-error); border:1px solid hsla(0,75%,55%,0.3); border-radius:var(--radius-full); padding:2px 8px; animation:pulse-badge 1.5s infinite; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand" id="sidebar-brand"><i class="fa-solid fa-utensils"></i> WIN Restaurant</div>
+      <div class="sidebar-subtitle">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="../" class="sidebar-link"><span class="icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard</a>
+      <a href="../menu-manage/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-clipboard-list"></i></span> Menu Management</a>
+      <a href="../orders/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-box"></i></span> Order Management</a>
+      <a href="./" class="sidebar-link active"><span class="icon"><i class="fa-solid fa-ban" style="color:var(--clr-error);"></i></span> Cancellations</a>
+      <a href="../qr/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-qrcode"></i></span> QR Codes</a>
+      <a href="../../kitchen/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-kitchen-set"></i></span> Kitchen Display</a>
+      <a href="../../menu/?t=T1" class="sidebar-link"><span class="icon"><i class="fa-solid fa-mobile-screen"></i></span> Customer View</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn--ghost btn--full btn--sm" id="logout-btn">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-page-header">
+      <h1 class="admin-page-title"><i class="fa-solid fa-ban" style="color:var(--clr-error);"></i> Cancellations</h1>
+      <div style="display:flex; gap:var(--sp-3); align-items:center;">
+        <div class="auto-refresh-note">
+          <span class="refresh-dot"></span> Auto-refreshing
+        </div>
+        <button class="btn btn--sm export-btn-excel" id="export-excel-btn" onclick="exportCancellationsCSV()">
+          <i class="fa-solid fa-file-excel"></i> Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="cancel-summary-grid stagger" id="cancel-summary-grid">
+      <div class="cancel-summary-card" style="--stat-accent:var(--clr-error);--stat-bg:hsla(0,75%,55%,0.1);--stat-color:var(--clr-error);">
+        <div class="cancel-summary-icon"><i class="fa-solid fa-ban"></i></div>
+        <div class="cancel-summary-info">
+          <span class="cancel-summary-label">Cancelled Today</span>
+          <span class="cancel-summary-value" id="stat-today">Ã¢â‚¬â€</span>
+        </div>
+      </div>
+      <div class="cancel-summary-card" style="--stat-accent:hsl(25,90%,55%);--stat-bg:hsla(25,90%,50%,0.1);--stat-color:hsl(25,90%,55%);">
+        <div class="cancel-summary-icon"><i class="fa-solid fa-calendar-day"></i></div>
+        <div class="cancel-summary-info">
+          <span class="cancel-summary-label">Total Cancelled</span>
+          <span class="cancel-summary-value" id="stat-total">Ã¢â‚¬â€</span>
+        </div>
+      </div>
+      <div class="cancel-summary-card" style="--stat-accent:var(--clr-warning);--stat-bg:hsla(45,100%,50%,0.1);--stat-color:var(--clr-warning);">
+        <div class="cancel-summary-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="cancel-summary-info">
+          <span class="cancel-summary-label">Active Orders</span>
+          <span class="cancel-summary-value" id="stat-pending">Ã¢â‚¬â€</span>
+          <span class="cancel-summary-value" id="stat-pending">—</span>
+        </div>
+      </div>
+      <div class="cancel-summary-card" style="--stat-accent:var(--clr-info);--stat-bg:hsla(210,80%,55%,0.1);--stat-color:var(--clr-info);">
+        <div class="cancel-summary-icon"><i class="fa-solid fa-sack-xmark"></i></div>
+        <div class="cancel-summary-info">
+          <span class="cancel-summary-label">Revenue Lost Today</span>
+          <span class="cancel-summary-value" id="stat-revenue-lost">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- URGENT: Customer-initiated Cancellation Requests -->
+    <div class="cancel-requests-section" id="urgent-requests-section">
+      <div class="cancel-requests-header">
+        <div class="cancel-requests-title">
+          <i class="fa-solid fa-triangle-exclamation" style="color:var(--clr-error);"></i>
+          Cancellation Requests
+          <span class="pending-badge" id="urgent-count" style="display:none; background:var(--clr-error);">0</span>
+        </div>
+        <span style="font-size:var(--fs-xs); color:var(--clr-text-muted);">Customer-initiated — Admin review required</span>
+      </div>
+      <div id="urgent-request-cards-container">
+        <div class="no-requests">
+          <div class="no-requests-icon"><i class="fa-solid fa-circle-check" style="color:var(--clr-success);"></i></div>
+          <h3>No Pending Requests</h3>
+          <p>No customers have requested cancellations right now.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Manually cancel any active order -->
+    <div class="cancel-requests-section">
+      <div class="cancel-requests-header">
+        <div class="cancel-requests-title">
+          <i class="fa-solid fa-clock" style="color:var(--clr-warning);"></i>
+          Cancel an Active Order
+          <span class="pending-badge" id="pending-count" style="display:none;">0</span>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="loadData()">
+          <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+      </div>
+      <div id="cancel-request-cards-container">
+        <div class="no-requests">
+          <div class="no-requests-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          <h3>Loading active orders&hellip;</h3>
+          <p>Checking for orders available to cancel.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancellation History Table -->
+    <div class="data-table-wrapper">
+      <div class="data-table-header">
+        <h3><i class="fa-solid fa-list"></i> Cancellation History</h3>
+        <div class="cancellation-filters">
+          <div class="cancellation-search">
+            <span class="cancellation-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" class="cancellation-search-input" id="cancel-search-input"
+                   placeholder="Search by Order ID, reason, or cancelled by…">
+          </div>
+          <select class="form-select" id="reason-filter" style="max-width:180px;font-size:var(--fs-sm);padding:var(--sp-2) var(--sp-3);">
+            <option value="">All Reasons</option>
+          </select>
+        </div>
+      </div>
+
+      <table class="data-table responsive-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Table</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Cancelled By</th>
+            <th>Cancelled At</th>
+            <th>Refund</th>
+          </tr>
+        </thead>
+        <tbody id="cancellation-table-body">
+          <tr>
+            <td colspan="7" style="text-align:center;padding:2rem;color:var(--clr-text-muted);">
+              <div class="spinner" style="margin:0 auto var(--sp-3);"></div>
+              Loading cancellation history…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" id="cancel-empty" style="display:none;">
+        <div class="empty-state-icon">✅</div>
+        <h3>No Cancellations Found</h3>
+        <p>No cancelled orders match your search. A low cancellation rate means happy customers!</p>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="data-table-wrapper" style="margin-top:var(--sp-6);">
+      <div class="data-table-header">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> Activity Log</h3>
+      </div>
+      <div class="activity-log" id="activity-log">
+        <div style="text-align:center;padding:var(--sp-8);color:var(--clr-text-muted);font-size:var(--fs-sm);">
+          <i class="fa-solid fa-spinner fa-spin"></i> Loading log…
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/cancellation.js"></script>
+<script>
+  /* Auth Guard */
+  if (!sessionStorage.getItem(CONFIG.STORAGE_KEYS.AUTH)) {
+    window.location.href = '../login/';
+  }
+
+  let allCancellations = [];
+  let pendingOrders = [];
+  let searchQuery = '';
+  let reasonFilter = '';
+  const adminRole = sessionStorage.getItem(CONFIG.STORAGE_KEYS.ROLE) || CONFIG.ROLES.ADMIN;
+  const adminName = sessionStorage.getItem(CONFIG.STORAGE_KEYS.ADMIN_NAME) || 'Admin';
+
+  async function init() {
+    setupSidebar();
+    const name = sessionStorage.getItem('restaurant_name');
+    if (name) document.getElementById('sidebar-brand').innerHTML = '<i class="fa-solid fa-utensils"></i> ' + name;
+    await loadData();
+    setInterval(loadData, 15000);
+  }
+
+  async function loadData() {
+    await Promise.all([loadPendingOrders(), loadCancellationHistory()]);
+  }
+
+  async function loadPendingOrders() {
+    try {
+      const orders = await API.getOrders();
+      const urgentRequests = orders.filter(o => o.status === 'Cancellation Requested');
+      const activeOrders   = orders.filter(o => canCancelOrder(adminRole, o.status) && o.status !== 'Cancellation Requested');
+      renderCancellationRequests(urgentRequests);
+      pendingOrders = activeOrders;
+    } catch (err) {
+      console.warn('[Cancellations] Could not load orders:', err.message);
+      renderCancellationRequests([]);
+      pendingOrders = [
+        { orderId: 'M249', table: 'T2', customerName: 'Manish', mobileNumber: '9876543210', items: [{name:'Margherita Pizza', qty:2, price:299}, {name:'Cold Coffee', qty:1, price:129}], total: 727, status: 'New', timestamp: new Date().toISOString(), notes: '', cancel_reason: '' },
+        { orderId: 'K603', table: 'T5', customerName: 'Ravi', mobileNumber: '9988776655', items: [{name:'Veg Burger', qty:3, price:149}], total: 447, status: 'Preparing', timestamp: new Date(Date.now() - 600000).toISOString(), notes: '', cancel_reason: '' },
+      ];
+    }
+    document.getElementById('stat-pending').textContent = pendingOrders.length;
+    renderPendingRequests();
+  }
+
+  function renderCancellationRequests(requests) {
+    const container   = document.getElementById('urgent-request-cards-container');
+    const urgentBadge = document.getElementById('urgent-count');
+    if (!container) return;
+
+    if (requests.length === 0) {
+      urgentBadge.style.display = 'none';
+      container.innerHTML = '<div class="no-requests"><div class="no-requests-icon"><i class="fa-regular fa-circle-check" style="color:var(--clr-success);"></i></div><h3>No Pending Requests</h3><p>No customers have requested cancellations right now.</p></div>';
+      return;
+    }
+
+    urgentBadge.textContent = requests.length;
+    urgentBadge.style.display = 'inline-block';
+
+    const html = requests.map(order => {
+      const items = (order.items || []).map(i => i.qty + 'x ' + i.name).join(', ');
+      const tableDisplay = /^\d+$/.test(String(order.table)) ? 'T' + order.table : order.table;
+      return '<div class="cancel-request-card urgent">' +
+        '<div class="cancel-request-card-header">' +
+          '<span class="cancel-request-order-id">#' + order.orderId + '</span>' +
+          '<div style="display:flex;gap:var(--sp-2);align-items:center;">' +
+            '<span class="cancel-request-table">' + tableDisplay + '</span>' +
+            '<span class="urgent-badge"><i class="fa-solid fa-triangle-exclamation"></i> Customer Request</span>' +
+          '</div>' +
+        '</div>' +
+        (order.cancel_reason ? '<div style="margin-bottom:var(--sp-3);"><span class="customer-reason-tag"><i class="fa-solid fa-message"></i> Customer says: <strong>' + order.cancel_reason + '</strong></span></div>' : '') +
+        '<div class="cancel-request-items">' + (items || '\u2014') + '</div>' +
+        (order.customerName ? '<div class="cancel-request-customer">' + order.customerName + (order.mobileNumber ? ' - ' + order.mobileNumber : '') + '</div>' : '') +
+        '<div class="cancel-request-total">' + formatPrice(order.total) + '</div>' +
+        '<div class="cancel-request-actions" style="display:flex; gap:8px;">' +
+          '<button class="btn btn--sm btn--primary urgent-reject-btn"' +
+            ' data-order-id="' + order.orderId + '">' +
+            '<i class="fa-solid fa-xmark"></i> Reject' +
+          '</button>' +
+          '<button class="btn btn--sm btn--cancel-confirm urgent-accept-btn"' +
+            ' data-order-id="' + order.orderId + '"' +
+            ' data-order-reason="' + (order.cancel_reason || 'Customer Requested') + '">' +
+            '<i class="fa-solid fa-check"></i> Accept Cancel' +
+          '</button>' +
+        '</div>' +
+        '<div class="cancel-request-time">' + formatTime(order.timestamp) + '</div>' +
+      '</div>';
+    }).join('');
+
+    container.innerHTML = '<div class="cancel-request-cards">' + html + '</div>';
+
+    document.querySelectorAll('.urgent-accept-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const orderId = btn.dataset.orderId;
+        const reason = btn.dataset.orderReason;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>...';
+        
+        try {
+          await API.cancelOrder(orderId, reason, 'Accepted by Admin', adminName, adminRole, 'Not Required');
+          showToast('Cancellation Accepted for Order #' + orderId, 'success');
+          if (typeof CancellationEngine !== 'undefined') CancellationEngine.logActivity(orderId, adminRole, 'Cancelled', reason);
+          await loadData();
+        } catch (err) {
+          showToast('Failed to accept cancellation.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+    });
+
+    document.querySelectorAll('.urgent-reject-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const orderId = btn.dataset.orderId;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>...';
+        
+        try {
+          // Revert back to Accepted
+          await API.updateOrderStatus(orderId, 'Accepted');
+          showToast('Cancellation Request Rejected.', 'info');
+          await loadData();
+        } catch (err) {
+          showToast('Failed to reject request.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+    });
+  }
+
+  function renderPendingRequests() {
+    const container = document.getElementById('cancel-request-cards-container');
+    const pendingBadge = document.getElementById('pending-count');
+
+    if (pendingOrders.length === 0) {
+      pendingBadge.style.display = 'none';
+      container.innerHTML = '<div class="no-requests"><div class="no-requests-icon"><i class="fa-regular fa-circle-check" style="color:var(--clr-success);"></i></div><h3>No Active Orders</h3><p>All orders are completed or already cancelled. Nothing to cancel right now.</p></div>';
+      return;
+    }
+
+    pendingBadge.textContent = pendingOrders.length;
+    pendingBadge.style.display = 'inline-block';
+
+    const statusBadge = { 'New': 'badge--info', 'Accepted': 'badge--primary', 'Preparing': 'badge--warning', 'Ready': 'badge--success', 'Delivered': 'badge--success' };
+
+    container.innerHTML = '<div class="cancel-request-cards">' +
+      pendingOrders.map(order => {
+        const items = (order.items || []).map(i => i.qty + '\xd7 ' + i.name).join(', ');
+        const tableDisplay = /^\d+$/.test(order.table) ? 'T' + order.table : order.table;
+        return '<div class="cancel-request-card">' +
+          '<div class="cancel-request-card-header">' +
+            '<span class="cancel-request-order-id">#' + order.orderId + '</span>' +
+            '<span class="cancel-request-table">' + tableDisplay + '</span>' +
+          '</div>' +
+          '<div style="margin-bottom:var(--sp-2);"><span class="badge ' + (statusBadge[order.status] || 'badge--info') + '">' + order.status + '</span></div>' +
+          '<div class="cancel-request-items">' + (items || '\u2014') + '</div>' +
+          (order.customerName ? '<div class="cancel-request-customer">\ud83d\udc64 ' + order.customerName + (order.mobileNumber ? ' \xb7 ' + order.mobileNumber : '') + '</div>' : '') +
+          '<div class="cancel-request-total">' + formatPrice(order.total) + '</div>' +
+          '<div class="cancel-request-actions">' +
+            '<button class="btn--cancel-confirm admin-cancel-btn"' +
+              ' data-order-id="' + order.orderId + '"' +
+              ' data-order-status="' + order.status + '"' +
+              ' data-order-table="' + order.table + '"' +
+              ' data-order-total="' + order.total + '">' +
+              '<i class="fa-solid fa-ban"></i> Cancel Order' +
+            '</button>' +
+          '</div>' +
+          '<div class="cancel-request-time">' + formatTime(order.timestamp) + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+    document.querySelectorAll('.admin-cancel-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const order = {
+          orderId: btn.dataset.orderId,
+          status: btn.dataset.orderStatus,
+          table: btn.dataset.orderTable,
+          total: btn.dataset.orderTotal,
+        };
+        CancellationEngine.openDialog(order, adminRole, async (result) => {
+          showToast('Order #' + result.orderId + ' has been cancelled.', 'error');
+          await loadData();
+        });
+      });
+    });
+  }
+
+  async function loadCancellationHistory() {
+    let apiData = null;
+    try {
+      apiData = await API.getCancellationStats();
+    } catch (e) {
+      console.warn('[Cancellations] API not available:', e.message);
+    }
+
+    const localStats = CancellationEngine.getLocalStats();
+    const localLog = localStats.log;
+
+    if (apiData && apiData.cancellations) {
+      allCancellations = apiData.cancellations;
+    } else {
+      allCancellations = localLog.map(entry => ({
+        orderId: entry.orderId, table: '\u2014', total: 0,
+        reason: entry.reason, cancelledBy: entry.cancelledBy,
+        cancelledRole: entry.cancelledRole, cancelledAt: entry.cancelledAt,
+        refundStatus: 'Not Required', remarks: '',
+      })).sort((a, b) => new Date(b.cancelledAt) - new Date(a.cancelledAt));
+    }
+
+    populateReasonFilter();
+    renderStats();
+    renderTable();
+    renderActivityLog(localLog);
+  }
+
+  function populateReasonFilter() {
+    const select = document.getElementById('reason-filter');
+    const reasons = [...new Set(allCancellations.map(c => c.reason).filter(Boolean))];
+    select.innerHTML = '<option value="">All Reasons</option>' +
+      reasons.map(r => '<option value="' + r + '">' + r + '</option>').join('');
+  }
+
+  function renderStats() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayList = allCancellations.filter(c => c.cancelledAt && c.cancelledAt.startsWith(todayStr));
+    const revenueLostToday = todayList.reduce((s, c) => s + (Number(c.total) || 0), 0);
+    document.getElementById('stat-today').textContent = todayList.length;
+    document.getElementById('stat-total').textContent = allCancellations.length;
+    document.getElementById('stat-revenue-lost').textContent = revenueLostToday > 0 ? formatPrice(revenueLostToday) : '\u20b90';
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('cancellation-table-body');
+    const emptyEl = document.getElementById('cancel-empty');
+
+    let filtered = allCancellations;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(c =>
+        (c.orderId || '').toLowerCase().includes(q) ||
+        (c.reason || '').toLowerCase().includes(q) ||
+        (c.cancelledBy || '').toLowerCase().includes(q) ||
+        (c.table || '').toLowerCase().includes(q)
+      );
+    }
+    if (reasonFilter) filtered = filtered.filter(c => c.reason === reasonFilter);
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      emptyEl.style.display = 'block';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    const refundClass = { 'Refunded': 'badge--success', 'Refund Pending': 'badge--warning', 'Not Required': 'badge--info' };
+
+    tbody.innerHTML = filtered.map(c => {
+      const tableDisplay = (c.table === 'Takeaway' || c.table === '\u2014') ? c.table : /^\d+$/.test(c.table) ? 'T' + c.table : c.table;
+      const isAdminCancel = CONFIG.PRIVILEGED_ROLES.includes(c.cancelledRole);
+      return '<tr>' +
+        '<td data-label="Order ID"><strong style="text-decoration:line-through;opacity:0.7;">' + c.orderId + '</strong></td>' +
+        '<td data-label="Table"><span class="badge badge--primary">' + tableDisplay + '</span></td>' +
+        '<td data-label="Amount">' + (c.total ? formatPrice(c.total) : '\u2014') + '</td>' +
+        '<td data-label="Reason"><span class="admin-reason-tag"><i class="fa-solid fa-ban"></i> ' + (c.reason || '\u2014') + '</span>' +
+          (c.remarks ? '<div style="font-size:var(--fs-xs);color:var(--clr-text-muted);margin-top:3px;">' + c.remarks + '</div>' : '') +
+        '</td>' +
+        '<td data-label="Cancelled By"><div style="display:flex;flex-direction:column;gap:3px;">' +
+          '<span>' + (c.cancelledBy || '\u2014') + '</span>' +
+          (isAdminCancel ? '<span class="admin-badge"><i class="fa-solid fa-shield-halved"></i> ' + (c.cancelledRole || 'Admin') + '</span>' :
+            '<span class="badge badge--primary" style="font-size:0.65rem;">' + (c.cancelledRole || '\u2014') + '</span>') +
+        '</div></td>' +
+        '<td data-label="Cancelled At" style="font-size:var(--fs-xs);color:var(--clr-text-muted);">' +
+          (c.cancelledAt ? formatDate(c.cancelledAt) + '<br>' + formatTime(c.cancelledAt) : '\u2014') +
+        '</td>' +
+        '<td data-label="Refund"><span class="badge ' + (refundClass[c.refundStatus] || 'badge--info') + '">' + (c.refundStatus || '\u2014') + '</span></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderActivityLog(log) {
+    const el = document.getElementById('activity-log');
+    if (!log || log.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:var(--sp-8);color:var(--clr-text-muted);font-size:var(--fs-sm);">No activity recorded yet.</div>';
+      return;
+    }
+    el.innerHTML = log.slice(0, 20).map(entry =>
+      '<div class="activity-log-item">' +
+        '<div class="activity-log-time">' + (entry.cancelledAt ? formatTime(entry.cancelledAt) : '\u2014') + '</div>' +
+        '<div class="activity-log-content">' +
+          'Order <strong>#' + entry.orderId + '</strong> cancelled by ' +
+          '<strong>' + entry.cancelledBy + '</strong> ' +
+          '<span class="admin-badge" style="vertical-align:middle;"><i class="fa-solid fa-shield-halved"></i> ' + entry.cancelledRole + '</span>.' +
+          '<br>Reason: <em>' + entry.reason + '</em>' +
+          (entry.demo ? ' <span style="opacity:0.5;">[demo]</span>' : '') +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function exportCancellationsCSV() {
+    const btn = document.getElementById('export-excel-btn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exporting\u2026';
+
+    const headers = ['Order ID','Table','Amount','Reason','Remarks','Cancelled By','Cancelled Role','Cancelled At','Refund Status'];
+    let csv = '\uFEFF' + headers.map(h => '"' + h + '"').join(',') + '\r\n';
+    allCancellations.forEach(c => {
+      const row = [c.orderId, c.table, c.total || '', c.reason, c.remarks || '', c.cancelledBy, c.cancelledRole, c.cancelledAt ? new Date(c.cancelledAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '', c.refundStatus];
+      csv += row.map(v => '"' + String(v || '').replace(/"/g, '""') + '"').join(',') + '\r\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'WINRMS_Cancellations_' + new Date().toISOString().split('T')[0] + '.csv';
+    link.click();
+    showToast('Cancellation report exported!', 'success');
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+
+  document.getElementById('cancel-search-input').addEventListener('input', e => {
+    searchQuery = e.target.value.trim();
+    renderTable();
+  });
+
+  document.getElementById('reason-filter').addEventListener('change', e => {
+    reasonFilter = e.target.value;
+    renderTable();
+  });
+
+  function setupSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    function toggle() { sidebar.classList.toggle('open'); backdrop.classList.toggle('active'); }
+    document.getElementById('sidebar-toggle').addEventListener('click', toggle);
+    backdrop.addEventListener('click', toggle);
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = '../login/';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('../../sw.js', { scope: '../../' })
+        .catch(err => console.warn('SW error', err));
+    });
+  }
+</script>
+<script src="../../js/notifications.js"></script>
+</body>
+</html>
+
+
+

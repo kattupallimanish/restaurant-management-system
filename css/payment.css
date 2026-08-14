@@ -1,0 +1,1420 @@
+/* ============================================
+   PAYMENT & CANCELLATION SYSTEM STYLES
+   Restaurant Management System — WINRMS
+   ============================================ */
+
+/* ── Payment Page Layout ── */
+.payment-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-6) var(--sp-4) var(--sp-12);
+  background: radial-gradient(ellipse at top, hsl(220, 20%, 9%) 0%, var(--clr-bg-primary) 70%);
+}
+
+.payment-container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ── Invoice Header Card ── */
+.invoice-card {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.invoice-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-primary), var(--clr-accent));
+}
+
+.invoice-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.invoice-brand-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-600));
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--clr-text-inverse);
+  font-weight: var(--fw-bold);
+  flex-shrink: 0;
+}
+
+.invoice-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.invoice-brand-name {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+}
+
+.invoice-brand-tag {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.invoice-number {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-primary-300);
+  background: var(--clr-bg-elevated);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--sp-4);
+  border: 1px solid var(--clr-border);
+  word-break: break-all;
+}
+
+.invoice-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.invoice-detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.invoice-detail-row.full-width {
+  grid-column: 1 / -1;
+}
+
+.invoice-detail-label {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.invoice-detail-value {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+}
+
+.invoice-amount {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-extrabold);
+  color: var(--clr-primary);
+}
+
+/* ── Payment Method Selector ── */
+.payment-method-section {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+}
+
+.payment-section-title {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.payment-method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.payment-method-card {
+  background: var(--clr-bg-secondary);
+  border: 2px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-method-card:hover {
+  border-color: var(--clr-primary-400);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.payment-method-card.selected {
+  border-color: var(--clr-primary);
+  background: hsla(36, 95%, 50%, 0.08);
+  box-shadow: 0 0 0 1px var(--clr-primary), var(--shadow-glow);
+}
+
+.payment-method-card.selected-cash {
+  border-color: var(--clr-success);
+  background: hsla(152, 70%, 45%, 0.08);
+  box-shadow: 0 0 0 1px var(--clr-success);
+}
+
+.payment-method-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  transition: all var(--transition-base);
+}
+
+.payment-method-icon.upi {
+  background: linear-gradient(135deg, hsl(260, 70%, 20%), hsl(260, 60%, 30%));
+}
+
+.payment-method-icon.cash {
+  background: linear-gradient(135deg, hsl(152, 60%, 18%), hsl(152, 50%, 28%));
+}
+
+.payment-method-card.selected .payment-method-icon.upi {
+  background: linear-gradient(135deg, hsl(36, 95%, 40%), hsl(36, 95%, 50%));
+}
+
+.payment-method-name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+}
+
+.payment-method-desc {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  line-height: 1.4;
+}
+
+.payment-method-check {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--clr-primary);
+  color: var(--clr-text-inverse);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+}
+
+.payment-method-card.selected .payment-method-check,
+.payment-method-card.selected-cash .payment-method-check {
+  display: flex;
+}
+
+.payment-method-card.selected-cash .payment-method-check {
+  background: var(--clr-success);
+}
+
+/* ── UPI Payment Panel ── */
+.upi-panel, .cash-panel {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  display: none;
+  animation: fadeInUp 300ms ease forwards;
+}
+
+.upi-panel.active, .cash-panel.active {
+  display: block;
+}
+
+/* QR Code container */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+  background: white;
+  border-radius: var(--radius-xl);
+  margin: var(--sp-4) 0;
+  border: 2px solid var(--clr-border);
+}
+
+.qr-code-wrapper {
+  padding: var(--sp-3);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+#qr-code-canvas {
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.qr-scan-label {
+  font-size: var(--fs-sm);
+  color: hsl(220, 20%, 30%);
+  font-weight: var(--fw-semibold);
+  text-align: center;
+}
+
+.qr-upi-apps {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.qr-app-badge {
+  font-size: var(--fs-xs);
+  background: hsl(220, 10%, 92%);
+  color: hsl(220, 20%, 30%);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: var(--fw-medium);
+}
+
+/* UPI deep-link button (mobile) */
+.upi-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-4) var(--sp-6);
+  background: linear-gradient(135deg, hsl(260, 70%, 45%), hsl(260, 60%, 55%));
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  box-shadow: 0 4px 16px hsla(260, 70%, 45%, 0.4);
+  margin: var(--sp-4) 0;
+}
+
+.upi-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px hsla(260, 70%, 45%, 0.5);
+}
+
+.upi-pay-btn:active {
+  transform: scale(0.97);
+}
+
+/* Payment note display */
+.payment-note {
+  background: var(--clr-bg-elevated);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+  margin: var(--sp-3) 0;
+}
+
+.payment-note strong {
+  color: var(--clr-text-secondary);
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Payment Status Badge ── */
+.payment-status-display {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--radius-lg);
+  margin: var(--sp-4) 0;
+  font-weight: var(--fw-semibold);
+}
+
+.payment-status-display.awaiting {
+  background: hsla(45, 100%, 50%, 0.1);
+  border: 1px solid hsla(45, 100%, 50%, 0.3);
+  color: hsl(45, 80%, 55%);
+}
+
+.payment-status-display.initiated {
+  background: hsla(210, 80%, 55%, 0.1);
+  border: 1px solid hsla(210, 80%, 55%, 0.3);
+  color: var(--clr-info);
+}
+
+.payment-status-display.success {
+  background: hsla(152, 70%, 45%, 0.1);
+  border: 1px solid hsla(152, 70%, 45%, 0.3);
+  color: var(--clr-success);
+}
+
+.payment-status-display.failed {
+  background: hsla(0, 75%, 55%, 0.1);
+  border: 1px solid hsla(0, 75%, 55%, 0.3);
+  color: var(--clr-error);
+}
+
+.payment-status-display.cash {
+  background: hsla(152, 70%, 45%, 0.08);
+  border: 1px dashed hsla(152, 70%, 45%, 0.4);
+  color: var(--clr-success);
+}
+
+.payment-status-icon {
+  font-size: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+.payment-status-display.success .payment-status-icon,
+.payment-status-display.cash .payment-status-icon {
+  animation: none;
+}
+
+/* ── Already Paid Banner ── */
+.already-paid-banner {
+  background: hsla(152, 70%, 45%, 0.1);
+  border: 1px solid var(--clr-success);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+}
+
+.already-paid-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--clr-success), hsl(152, 70%, 35%));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto var(--sp-4);
+  box-shadow: 0 0 24px hsla(152, 70%, 45%, 0.3);
+}
+
+.already-paid-title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--clr-success);
+  margin-bottom: var(--sp-2);
+}
+
+/* ── Cash Payment Panel ── */
+.cash-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0;
+}
+
+.cash-info-item {
+  background: var(--clr-bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.cash-info-label {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--sp-1);
+}
+
+.cash-info-value {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+}
+
+.notify-cashier-btn {
+  width: 100%;
+  padding: var(--sp-4) var(--sp-6);
+  background: linear-gradient(135deg, var(--clr-success), hsl(152, 70%, 35%));
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  box-shadow: 0 4px 16px hsla(152, 70%, 45%, 0.35);
+  margin: var(--sp-4) 0;
+}
+
+.notify-cashier-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px hsla(152, 70%, 45%, 0.45);
+}
+
+.notify-cashier-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Receipt Card ── */
+.receipt-card {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  display: none;
+}
+
+.receipt-card.active {
+  display: block;
+  animation: fadeInUp 400ms ease forwards;
+}
+
+.receipt-header {
+  text-align: center;
+  padding-bottom: var(--sp-4);
+  border-bottom: 2px dashed var(--clr-border);
+  margin-bottom: var(--sp-4);
+}
+
+.receipt-logo {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-extrabold);
+  background: linear-gradient(135deg, var(--clr-primary-300), var(--clr-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sp-1);
+}
+
+.receipt-tagline {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.receipt-invoice-no {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-family: 'Courier New', monospace;
+  color: var(--clr-primary-300);
+}
+
+.receipt-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--fs-sm);
+}
+
+.receipt-row-label {
+  color: var(--clr-text-muted);
+}
+
+.receipt-row-value {
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed var(--clr-border);
+  margin: var(--sp-3) 0;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-3) 0;
+  border-top: 2px solid var(--clr-border);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-extrabold);
+}
+
+.receipt-total-amount {
+  color: var(--clr-primary);
+}
+
+.receipt-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  background: hsla(152, 70%, 45%, 0.15);
+  color: var(--clr-success);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid hsla(152, 70%, 45%, 0.3);
+}
+
+.receipt-footer-text {
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px dashed var(--clr-border);
+}
+
+.receipt-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.receipt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+}
+
+.receipt-btn.download {
+  background: linear-gradient(135deg, #107c41, #1f9a55);
+  color: white;
+  box-shadow: 0 4px 12px hsla(143, 71%, 28%, 0.35);
+}
+
+.receipt-btn.print {
+  background: var(--clr-bg-elevated);
+  color: var(--clr-text-primary);
+  border: 1px solid var(--clr-border);
+}
+
+.receipt-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ── Cancellation Dialog Modal ── */
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsla(0, 0%, 0%, 0.7);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  padding: var(--sp-4);
+}
+
+.cancel-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cancel-modal {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-8) var(--sp-6);
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-xl);
+  transform: scale(0.95) translateY(10px);
+  transition: transform var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.cancel-modal-backdrop.active .cancel-modal {
+  transform: scale(1) translateY(0);
+}
+
+.cancel-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-error), hsl(0, 75%, 40%));
+}
+
+.cancel-modal-icon {
+  width: 64px;
+  height: 64px;
+  background: hsla(0, 75%, 55%, 0.12);
+  border: 2px solid hsla(0, 75%, 55%, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--clr-error);
+  margin: 0 auto var(--sp-4);
+}
+
+.cancel-modal-title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+  text-align: center;
+  margin-bottom: var(--sp-2);
+}
+
+.cancel-modal-warning {
+  font-size: var(--fs-sm);
+  color: var(--clr-text-secondary);
+  text-align: center;
+  margin-bottom: var(--sp-6);
+  line-height: var(--lh-relaxed);
+}
+
+.cancel-modal-warning strong {
+  color: var(--clr-error);
+}
+
+.cancel-reason-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.cancel-reason-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.cancel-reason-label .required-star {
+  color: var(--clr-error);
+}
+
+.cancel-reason-select {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--clr-bg-secondary);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-primary);
+  font-size: var(--fs-base);
+  transition: all var(--transition-fast);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sp-4) center;
+  padding-right: var(--sp-10);
+}
+
+.cancel-reason-select:focus {
+  outline: none;
+  border-color: var(--clr-error);
+  box-shadow: 0 0 0 3px hsla(0, 75%, 55%, 0.15);
+}
+
+.cancel-remarks-textarea {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--clr-bg-secondary);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-primary);
+  font-size: var(--fs-base);
+  resize: vertical;
+  min-height: 90px;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  display: none;
+  margin-top: var(--sp-3);
+}
+
+.cancel-remarks-textarea.show {
+  display: block;
+}
+
+.cancel-remarks-textarea:focus {
+  outline: none;
+  border-color: var(--clr-error);
+  box-shadow: 0 0 0 3px hsla(0, 75%, 55%, 0.15);
+}
+
+/* Refund status selector (for privileged roles) */
+.refund-status-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.cancel-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.btn--cancel-order {
+  background: linear-gradient(135deg, var(--clr-error), hsl(0, 75%, 45%));
+  color: white;
+  border: none;
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  box-shadow: 0 4px 12px hsla(0, 75%, 55%, 0.3);
+}
+
+.btn--cancel-order:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px hsla(0, 75%, 55%, 0.4);
+}
+
+.btn--cancel-order:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--go-back {
+  background: var(--clr-bg-elevated);
+  color: var(--clr-text-secondary);
+  border: 1px solid var(--clr-border);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn--go-back:hover {
+  background: var(--clr-bg-hover);
+  color: var(--clr-text-primary);
+}
+
+/* ── Cancellation Info Display (Order Status page) ── */
+.cancellation-info-card {
+  background: hsla(0, 75%, 55%, 0.08);
+  border: 1px solid hsla(0, 75%, 55%, 0.3);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  animation: fadeInUp 400ms ease forwards;
+}
+
+.cancellation-info-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.cancellation-info-icon {
+  width: 48px;
+  height: 48px;
+  background: hsla(0, 75%, 55%, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: var(--clr-error);
+  flex-shrink: 0;
+}
+
+.cancellation-info-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  color: var(--clr-error);
+}
+
+.cancellation-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.cancellation-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  font-size: var(--fs-sm);
+}
+
+.cancellation-info-row-label {
+  color: var(--clr-text-muted);
+  flex-shrink: 0;
+  min-width: 100px;
+}
+
+.cancellation-info-row-value {
+  color: var(--clr-text-secondary);
+  font-weight: var(--fw-medium);
+  text-align: right;
+}
+
+/* ── Cancel Button Variants ── */
+.btn--trigger-cancel {
+  background: transparent;
+  color: var(--clr-error);
+  border: 1.5px solid hsla(0, 75%, 55%, 0.45);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* When combined with .btn and .btn--sm, the btn--sm padding takes precedence via specificity —
+   we only override colors/border, not size */
+.btn.btn--sm.btn--trigger-cancel {
+  background: transparent;
+  color: var(--clr-error);
+  border: 1.5px solid hsla(0, 75%, 55%, 0.45);
+  box-shadow: none;
+}
+
+.btn--trigger-cancel:hover,
+.btn.btn--sm.btn--trigger-cancel:hover {
+  background: hsla(0, 75%, 55%, 0.12);
+  border-color: var(--clr-error);
+  box-shadow: 0 0 0 2px hsla(0, 75%, 55%, 0.15);
+}
+
+.cancel-not-allowed-msg {
+  background: hsla(45, 100%, 50%, 0.08);
+  border: 1px solid hsla(45, 100%, 50%, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: hsl(45, 80%, 55%);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* ── Cancelled Order Card Style (Admin) ── */
+.order-card.status-cancelled {
+  border-color: hsla(0, 75%, 55%, 0.35);
+  background: hsla(0, 75%, 55%, 0.04);
+  opacity: 0.85;
+}
+
+.order-card.status-cancelled .order-card-id {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.cancelled-badge {
+  background: var(--clr-error-bg);
+  color: var(--clr-error);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid hsla(0, 75%, 55%, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Cancellation Analytics Page ── */
+.cancel-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.cancel-stat-card {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.cancel-stat-card:hover {
+  border-color: var(--clr-border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.cancel-stat-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--stat-accent, var(--clr-error));
+  opacity: 0.7;
+}
+
+.cancel-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--stat-bg, hsla(0, 75%, 55%, 0.1));
+  color: var(--stat-color, var(--clr-error));
+  margin-bottom: var(--sp-1);
+}
+
+.cancel-stat-label {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cancel-stat-value {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-extrabold);
+  color: var(--clr-text-primary);
+  line-height: 1;
+}
+
+.cancel-stat-sub {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+}
+
+/* ── Charts Container ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+@media (max-width: 768px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+  .payment-method-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cancel-modal-actions {
+    grid-template-columns: 1fr;
+  }
+  .receipt-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--clr-bg-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+}
+
+.chart-title {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  height: 200px;
+}
+
+/* ── AI Insights Panel ── */
+.ai-insights-card {
+  background: linear-gradient(135deg, hsl(260, 20%, 12%), hsl(260, 18%, 15%));
+  border: 1px solid hsl(260, 20%, 22%);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-insights-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, hsl(260, 80%, 60%), hsl(200, 80%, 60%), hsl(140, 70%, 55%));
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+
+.ai-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, hsl(260, 70%, 40%), hsl(260, 60%, 50%));
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.ai-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  color: var(--clr-text-primary);
+}
+
+.ai-subtitle {
+  font-size: var(--fs-xs);
+  color: hsl(260, 40%, 65%);
+}
+
+.ai-insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+@media (max-width: 600px) {
+  .ai-insights-grid { grid-template-columns: 1fr; }
+}
+
+.ai-insight-item {
+  background: hsla(260, 20%, 20%, 0.6);
+  border: 1px solid hsl(260, 20%, 25%);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+}
+
+.ai-insight-icon {
+  font-size: 1.3rem;
+  margin-bottom: var(--sp-2);
+}
+
+.ai-insight-label {
+  font-size: var(--fs-xs);
+  color: hsl(260, 40%, 65%);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--sp-1);
+}
+
+.ai-insight-value {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+}
+
+.ai-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.ai-recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: hsla(260, 20%, 20%, 0.5);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  color: var(--clr-text-secondary);
+  border: 1px solid hsl(260, 20%, 25%);
+}
+
+.ai-recommendation-icon {
+  color: hsl(260, 70%, 65%);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Activity Log ── */
+.activity-log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.activity-log-item {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--clr-bg-elevated);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--clr-error);
+  font-size: var(--fs-sm);
+}
+
+.activity-log-time {
+  color: var(--clr-text-muted);
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  padding-top: 2px;
+}
+
+.activity-log-content {
+  color: var(--clr-text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.activity-log-content strong {
+  color: var(--clr-text-primary);
+}
+
+/* ── Invoice display on Order Card (Admin) ── */
+.order-invoice-no {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  font-family: 'Courier New', monospace;
+  margin-bottom: var(--sp-2);
+}
+
+.payment-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.payment-pill--awaiting {
+  background: hsla(45, 100%, 50%, 0.12);
+  color: hsl(45, 80%, 55%);
+  border: 1px solid hsla(45, 100%, 50%, 0.25);
+}
+
+.payment-pill--success, .payment-pill--cash-received {
+  background: hsla(152, 70%, 45%, 0.12);
+  color: var(--clr-success);
+  border: 1px solid hsla(152, 70%, 45%, 0.25);
+}
+
+.payment-pill--failed, .payment-pill--cancelled {
+  background: hsla(0, 75%, 55%, 0.12);
+  color: var(--clr-error);
+  border: 1px solid hsla(0, 75%, 55%, 0.2);
+}
+
+/* ── Polling Pulse indicator ── */
+.polling-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+  margin-top: var(--sp-3);
+}
+
+/* ── Print Styles ── */
+@media print {
+  body * { visibility: hidden; }
+  .receipt-printable, .receipt-printable * { visibility: visible; }
+  .receipt-printable {
+    position: fixed;
+    inset: 0;
+    background: white;
+    color: black;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+  }
+  .receipt-actions { display: none; }
+}
+
+/* ── Cancellation Search & Filter ── */
+.cancellation-filters {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.cancellation-search {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.cancellation-search-icon {
+  position: absolute;
+  left: var(--sp-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-text-muted);
+  font-size: var(--fs-sm);
+}
+
+.cancellation-search-input {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-10);
+  background: var(--clr-bg-secondary);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-primary);
+  font-size: var(--fs-sm);
+  transition: all var(--transition-fast);
+}
+
+.cancellation-search-input:focus {
+  outline: none;
+  border-color: var(--clr-primary-400);
+  box-shadow: 0 0 0 3px hsla(36, 95%, 50%, 0.15);
+}
+
+/* ── Export Buttons Row ── */
+.export-row {
+  display: flex;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.export-btn-pdf {
+  background: linear-gradient(135deg, hsl(4, 85%, 45%), hsl(4, 85%, 55%));
+  color: white;
+  box-shadow: 0 4px 12px hsla(4, 85%, 55%, 0.3);
+}
+
+.export-btn-excel {
+  background: linear-gradient(135deg, #107c41, #1f9a55);
+  color: white;
+  box-shadow: 0 4px 12px hsla(143, 71%, 28%, 0.3);
+}
+
+/* ── Payment Page back link ── */
+.payment-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--clr-text-muted);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--sp-4);
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+.payment-back-link:hover {
+  color: var(--clr-primary-400);
+}
+
+/* ── UPI Apps Row ── */
+.upi-apps-supported {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--sp-3);
+}
+
+.upi-apps-label {
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+}
+
+.upi-app-chip {
+  font-size: var(--fs-xs);
+  background: var(--clr-bg-elevated);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  padding: 2px var(--sp-2);
+  color: var(--clr-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

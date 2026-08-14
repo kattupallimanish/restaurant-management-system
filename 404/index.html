@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Page Not Found</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--clr-bg-primary);
+      text-align: center;
+      padding: var(--sp-6);
+      background-image: radial-gradient(circle at top right, rgba(var(--clr-primary-rgb, 255,107,107), 0.1), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(var(--clr-accent-rgb, 245,158,11), 0.05), transparent 40%);
+    }
+    
+    .error-code {
+      font-family: var(--font-heading);
+      font-size: 8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--clr-primary-400), var(--clr-primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0;
+      line-height: 1;
+      filter: drop-shadow(0 10px 20px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3));
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: var(--fs-xl);
+      margin-top: var(--sp-2);
+      margin-bottom: var(--sp-2);
+      color: var(--clr-text-primary);
+    }
+
+    p {
+      color: var(--clr-text-secondary);
+      font-size: var(--fs-md);
+      margin-bottom: var(--sp-6);
+      max-width: 400px;
+      line-height: var(--lh-relaxed);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: var(--sp-4);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-home {
+      padding: var(--sp-3) var(--sp-6);
+      font-size: var(--fs-base);
+      font-weight: var(--fw-bold);
+      background: linear-gradient(135deg, var(--clr-primary-400), var(--clr-primary));
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      transition: all var(--transition-base);
+      text-decoration: none;
+    }
+
+    .btn-home:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+    
+    .btn-back {
+      padding: var(--sp-3) var(--sp-6);
+      font-size: var(--fs-base);
+      font-weight: var(--fw-bold);
+      background: var(--clr-bg-card);
+      color: var(--clr-text-primary);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      transition: all var(--transition-base);
+    }
+    
+    .btn-back:hover {
+      background: var(--clr-bg-elevated);
+      border-color: var(--clr-border-light);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="error-code">404</div>
+  
+  <h1>Oops! Table or Page Not Found</h1>
+  <p>The link you followed might be broken, or the table number is incorrect. Let's get you back to the delicious menu.</p>
+  
+  <div class="btn-group">
+    <a href="../" class="btn-home">
+      <i class="fa-solid fa-house"></i> Go to Home
+    </a>
+  </div>
+
+</body>
+</html>

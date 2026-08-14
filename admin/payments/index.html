@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage Payments — Admin Panel.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Payments — Admin Panel</title>
+
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/admin.css">
+  <link rel="stylesheet" href="../../css/payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .payment-requests-section { margin-bottom: var(--sp-6); }
+    .payment-requests-header { display:flex; align-items:center; justify-content:space-between; gap:var(--sp-3); margin-bottom:var(--sp-4); }
+    .payment-requests-title { display:flex; align-items:center; gap:var(--sp-3); font-size:var(--fs-lg); font-weight:var(--fw-bold); color:var(--clr-text-primary); }
+    .pending-badge { background:var(--clr-success); color:#fff; font-size:var(--fs-xs); font-weight:var(--fw-bold); padding:2px 8px; border-radius:var(--radius-full); min-width:20px; text-align:center; animation:pulse-badge 2s ease-in-out infinite; }
+    @keyframes pulse-badge { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.05)} }
+    .payment-request-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:var(--sp-4); }
+    .payment-request-card { background:var(--clr-bg-elevated); border:1.5px solid hsla(152,70%,45%,0.35); border-radius:var(--radius-lg); padding:var(--sp-4); position:relative; overflow:hidden; transition:border-color var(--transition-base),box-shadow var(--transition-base); }
+    .payment-request-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--clr-success),hsl(152,70%,35%)); }
+    .payment-request-card:hover { border-color:hsla(152,70%,45%,0.6); box-shadow:0 4px 20px hsla(152,70%,45%,0.12); }
+    .payment-request-card.urgent { border-color:hsla(152,70%,45%,0.7); animation:requestPulse 2.5s ease-in-out infinite; }
+    @keyframes requestPulse { 0%,100%{box-shadow:0 0 0 0 hsla(152,70%,45%,0);} 50%{box-shadow:0 0 0 5px hsla(152,70%,45%,0.18);} }
+    .payment-request-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:var(--sp-3); }
+    .payment-request-order-id { font-size:var(--fs-md); font-weight:var(--fw-bold); color:var(--clr-text-primary); }
+    .payment-request-table { font-size:var(--fs-xs); color:var(--clr-success); background:hsla(152,70%,45%,0.12); padding:3px 8px; border-radius:var(--radius-full); border:1px solid hsla(152,70%,45%,0.25); }
+    .payment-request-invoice { font-family:monospace; font-size:var(--fs-sm); color:var(--clr-primary-400); margin-bottom:var(--sp-2); letter-spacing:1px; display:block; }
+    .payment-request-method { font-size:var(--fs-xs); color:var(--clr-text-muted); margin-bottom:var(--sp-3); display:flex; align-items:center; gap:var(--sp-1); }
+    .payment-request-total { font-size:var(--fs-2xl); font-weight:var(--fw-bold); color:var(--clr-text-primary); margin-bottom:var(--sp-4); }
+    .payment-request-actions { display:flex; gap:var(--sp-2); flex-wrap:wrap; }
+    .btn--payment-confirm { flex:1; background:linear-gradient(135deg,hsl(152,70%,35%),hsl(152,70%,45%)); color:#fff; border:none; padding:var(--sp-2) var(--sp-4); border-radius:var(--radius-md); font-size:var(--fs-sm); font-weight:var(--fw-semibold); cursor:pointer; transition:all var(--transition-base); display:inline-flex; align-items:center; justify-content:center; gap:var(--sp-2); }
+    .btn--payment-confirm:hover { filter:brightness(1.1); box-shadow:0 4px 12px hsla(152,70%,45%,0.35); }
+    .payment-request-time { font-size:var(--fs-xs); color:var(--clr-text-muted); margin-top:var(--sp-2); text-align:right; }
+    
+    .no-requests { text-align:center; padding:var(--sp-8) var(--sp-4); background:var(--clr-bg-elevated); border:1px solid var(--clr-border); border-radius:var(--radius-lg); color:var(--clr-text-muted); }
+    .no-requests-icon { font-size:2.5rem; margin-bottom:var(--sp-3); opacity:0.5; color:var(--clr-success); }
+    .no-requests h3 { font-size:var(--fs-md); font-weight:var(--fw-semibold); color:var(--clr-text-secondary); margin:0 0 var(--sp-2); }
+    .no-requests p { font-size:var(--fs-sm); margin:0; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand" id="sidebar-brand"><i class="fa-solid fa-utensils"></i> WIN Restaurant</div>
+      <div class="sidebar-subtitle">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="../" class="sidebar-link"><span class="icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard</a>
+      <a href="../menu-manage/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-clipboard-list"></i></span> Menu Management</a>
+      <a href="../orders/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-box"></i></span> Order Management</a>
+      <a href="./" class="sidebar-link active"><span class="icon"><i class="fa-solid fa-credit-card" style="color:var(--clr-success);"></i></span> Payments</a>
+      <a href="../cancellations/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-ban"></i></span> Cancellations</a>
+      <a href="../qr/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-qrcode"></i></span> QR Codes</a>
+      <a href="../../kitchen/" class="sidebar-link"><span class="icon"><i class="fa-solid fa-kitchen-set"></i></span> Kitchen Display</a>
+      <a href="../../menu/?t=T1" class="sidebar-link"><span class="icon"><i class="fa-solid fa-mobile-screen"></i></span> Customer View</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn--ghost btn--full btn--sm" id="logout-btn">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-page-header">
+      <h1 class="admin-page-title"><i class="fa-solid fa-credit-card" style="color:var(--clr-success);"></i> Payment Management</h1>
+      <div style="display:flex; gap:var(--sp-3); align-items:center;">
+        <div style="font-size:var(--fs-xs); color:var(--clr-text-muted); display:flex; align-items:center; gap:var(--sp-2);">
+          <span style="width:6px; height:6px; border-radius:50%; background:var(--clr-success); animation:pulse 2s infinite; display:inline-block;"></span> Auto-refreshing
+        </div>
+      </div>
+    </div>
+
+    <!-- URGENT: Cashier Notified Payments -->
+    <div class="payment-requests-section" id="urgent-requests-section">
+      <div class="payment-requests-header">
+        <div class="payment-requests-title">
+          <i class="fa-solid fa-money-bill-wave" style="color:var(--clr-success);"></i>
+          Awaiting Cash Verification
+          <span class="pending-badge" id="urgent-count" style="display:none;">0</span>
+        </div>
+        <span style="font-size:var(--fs-xs); color:var(--clr-text-muted);">Customers waiting at the counter</span>
+      </div>
+      <div id="urgent-request-cards-container">
+        <div class="no-requests">
+          <div class="no-requests-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <h3>No Pending Payments</h3>
+          <p>No customers are waiting to pay cash at the moment.</p>
+        </div>
+      </div>
+    </div>
+
+
+    
+  </main>
+</div>
+
+<!-- Core Scripts -->
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/notifications.js"></script>
+<script src="../../js/payments-admin.js"></script>
+
+</body>
+</html>

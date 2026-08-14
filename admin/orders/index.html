@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage and track restaurant orders in real-time.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Order Management — Admin Panel</title>
+
+  <!-- PWA Meta Tags & Manifest -->
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WIN Restaurant">
+  <link rel="apple-touch-icon" href="../../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/admin.css">
+  <link rel="stylesheet" href="../../css/payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      .status-cancellation-requested {
+        border-color: hsla(0,75%,55%,0.6) !important;
+        animation: cardPulse 2s infinite !important;
+      }
+      @keyframes cardPulse { 0%,100%{box-shadow:0 0 0 0 hsla(0,75%,55%,0);} 50%{box-shadow:0 0 0 4px hsla(0,75%,55%,0.2);} }
+    </style>
+  </head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand"><i class="fa-solid fa-utensils"></i> WIN Restaurant</div>
+        <div class="sidebar-subtitle">Admin Panel</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="../" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-chart-simple"></i></span> Dashboard
+        </a>
+        <a href="../menu-manage/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-clipboard-list"></i></span> Menu Management
+        </a>
+        <a href="./" class="sidebar-link active">
+          <span class="icon"><i class="fa-solid fa-box"></i></span> Order Management
+        </a>
+        <a href="../cancellations/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-ban" style="color:var(--clr-error);"></i></span> Cancellations
+        </a>
+        <a href="../qr/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-qrcode"></i></span> QR Codes
+        </a>
+        <a href="../../kitchen/" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-kitchen-set"></i></span> Kitchen Display
+        </a>
+        <a href="../../menu/?t=T1" class="sidebar-link">
+          <span class="icon"><i class="fa-solid fa-mobile-screen"></i></span> Customer View
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn--ghost btn--full btn--sm" id="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+      </div>
+    </aside>
+
+    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-page-header">
+        <h1 class="admin-page-title"><i class="fa-solid fa-box"></i> Order Management</h1>
+        <div style="display:flex; align-items:center; gap:var(--sp-3);">
+          <span class="refresh-indicator" style="font-size:var(--fs-xs); color:var(--clr-text-muted);">
+            <span class="refresh-dot" style="width:6px;height:6px;border-radius:50%;background:var(--clr-success);animation:pulse 2s infinite;display:inline-block;"></span>
+            Auto-refreshing
+          </span>
+        </div>
+      </div>
+
+      <!-- Waiter Calls -->
+      <div id="waiter-calls-container" style="display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-4);"></div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-status="">All</button>
+        <button class="filter-tab" data-status="New">🆕 New</button>
+        <button class="filter-tab" data-status="Accepted"><i class="fa-solid fa-circle-check"></i> Accepted</button>
+        <button class="filter-tab" data-status="Preparing"><i class="fa-solid fa-kitchen-set"></i> Preparing</button>
+        <button class="filter-tab" data-status="Ready"><i class="fa-solid fa-bell"></i> Ready</button>
+        <button class="filter-tab" data-status="Delivered"><i class="fa-solid fa-champagne-glasses"></i> Delivered</button>
+        <button class="filter-tab" data-status="Paid"><i class="fa-solid fa-credit-card"></i> Paid</button>
+        <button class="filter-tab" data-status="Rejected"><i class="fa-solid fa-circle-xmark"></i> Rejected</button>
+        <button class="filter-tab" data-status="Cancelled" style="color: var(--clr-error);"><i class="fa-solid fa-ban"></i> Cancelled</button>
+        <button class="filter-tab" data-status="Cancellation Requested" style="color: var(--clr-warning);"><i class="fa-solid fa-triangle-exclamation"></i> Cancel Req</button>
+      </div>
+
+      <!-- Order Cards -->
+      <div class="order-cards" id="order-cards">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--clr-text-muted);">
+          <div class="spinner" style="margin: 0 auto var(--sp-3);"></div>
+          Loading orders...
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="orders-empty" style="display: none;">
+        <div class="empty-state-icon">📭</div>
+        <h3>No orders found</h3>
+        <p>Orders will appear here when customers place them.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/config.js"></script>
+  <script src="../../js/api.js"></script>
+  <script src="../../js/cancellation.js"></script>
+  <script>
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Auth guard Ã¢â€â‚¬Ã¢â€â‚¬
+    if (!sessionStorage.getItem(CONFIG.STORAGE_KEYS.AUTH)) {
+      window.location.href = '../login/';
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ State Ã¢â€â‚¬Ã¢â€â‚¬
+    let allOrders = [];
+    let activeFilter = '';
+    const adminRole = sessionStorage.getItem(CONFIG.STORAGE_KEYS.ROLE) || CONFIG.ROLES.ADMIN;
+    const adminName = sessionStorage.getItem(CONFIG.STORAGE_KEYS.ADMIN_NAME) || adminRole;
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ DOM Ã¢â€â‚¬Ã¢â€â‚¬
+    const orderCardsEl = document.getElementById('order-cards');
+    const ordersEmpty = document.getElementById('orders-empty');
+    const filterTabs = document.getElementById('filter-tabs');
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Init Ã¢â€â‚¬Ã¢â€â‚¬
+    async function init() {
+      setupEventListeners();
+      await Promise.all([loadOrders(), loadWaiterCalls()]);
+      
+      // Auto-refresh every 5 seconds
+      setInterval(() => {
+        loadOrders();
+        loadWaiterCalls();
+      }, CONFIG.POLL_INTERVAL);
+    }
+
+    async function loadWaiterCalls() {
+      try {
+        const calls = await API.getWaiterCalls();
+        const container = document.getElementById('waiter-calls-container');
+        if (calls.length === 0) {
+          container.innerHTML = '';
+          return;
+        }
+        
+        container.innerHTML = calls.map(call => `
+          <div style="background: var(--clr-error); color: white; padding: var(--sp-3); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-family: var(--font-body);">
+            <span><i class="fa-solid fa-bell fa-shake"></i> Table ${call.table} called for a Waiter!</span>
+            <button class="btn btn--sm" style="background: white; color: var(--clr-error);" onclick="resolveWaiterCall('${call.table}')">Acknowledge</button>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.warn('Could not fetch waiter calls');
+      }
+    }
+
+    window.resolveWaiterCall = async function(table) {
+      try {
+        await API.resolveWaiterCall(table);
+        loadWaiterCalls();
+      } catch (err) {
+        showToast('Failed to resolve call', 'error');
+      }
+    };
+
+    async function loadOrders() {
+      try {
+        allOrders = await API.getOrders();
+        renderOrders();
+      } catch (err) {
+        // Demo data
+        allOrders = [
+          { orderId: 'M249', table: 'T2', customerName: 'Manish', mobileNumber: '9876543210', items: [{name:'Margherita Pizza', qty:2, price:299}, {name:'Cold Coffee', qty:1, price:129}], total: 727, status: 'New', timestamp: new Date().toISOString(), notes: 'Extra cheese' },
+          { orderId: 'K603', table: 'T5', customerName: 'Ravi', mobileNumber: '9988776655', items: [{name:'Veg Burger', qty:3, price:149}], total: 447, status: 'Preparing', timestamp: new Date(Date.now() - 600000).toISOString(), notes: '' },
+          { orderId: 'A094', table: 'T1', customerName: 'Sita', mobileNumber: '9848022338', items: [{name:'Gulab Jamun', qty:2, price:99}, {name:'Mango Lassi', qty:2, price:109}], total: 416, status: 'Ready', timestamp: new Date(Date.now() - 1200000).toISOString(), notes: '' },
+          { orderId: 'L882', table: 'T3', customerName: 'Arjun', mobileNumber: '9123456789', items: [{name:'Farmhouse Pizza', qty:1, price:349}], total: 349, status: 'Delivered', timestamp: new Date(Date.now() - 3600000).toISOString(), notes: '' },
+        ];
+        renderOrders();
+      }
+    }
+
+    function renderOrders() {
+      let filtered = [...allOrders];
+
+      if (activeFilter) {
+        filtered = filtered.filter(o => o.status === activeFilter);
+      }
+
+      if (filtered.length === 0) {
+        orderCardsEl.style.display = 'none';
+        ordersEmpty.style.display = 'block';
+        return;
+      }
+
+      orderCardsEl.style.display = 'grid';
+      ordersEmpty.style.display = 'none';
+
+      orderCardsEl.innerHTML = filtered.map(order => {
+        const statusClass = `status-${order.status.toLowerCase().replace(" ", "-")}`;
+        const items = order.items || [];
+        const nextStatuses = CONFIG.STATUS_FLOW[order.status] || [];
+        const isCancelled = order.status === 'Cancelled' || order.status === 'Rejected';
+        const invoiceNo = getOrCreateInvoiceNumber(order.orderId);
+        const canCancel = !isCancelled && canCancelOrder(adminRole, order.status);
+
+        // Payment pill
+        let payPill = '';
+        if (order.paymentStatus) {
+          const pillClass = {
+            'Payment Successful': 'payment-pill--success',
+            'Cash Received': 'payment-pill--cash-received',
+            'Awaiting Payment': 'payment-pill--awaiting',
+            'Awaiting Cash Payment': 'payment-pill--awaiting',
+            'Payment Failed': 'payment-pill--failed',
+            'Cancelled': 'payment-pill--cancelled',
+          }[order.paymentStatus] || 'payment-pill--awaiting';
+          payPill = `<span class="payment-status-pill ${pillClass}"><i class="fa-solid fa-credit-card"></i> ${order.paymentStatus}</span>`;
+        }
+
+        return `
+          <div class="order-card ${statusClass} ${isCancelled ? 'status-cancelled' : ''}">
+            <div class="order-card-header">
+              <span class="order-card-id">${order.orderId}</span>
+              <span class="order-card-table">🪑 ${order.table}</span>
+            </div>
+            <div class="order-invoice-no" title="Invoice">${invoiceNo}</div>
+            ${payPill}
+            <ul class="order-card-items" style="${isCancelled ? 'opacity:0.6;' : ''}">
+              ${items.map(i => `<li>${i.qty}× ${i.name}</li>`).join('')}
+            </ul>
+            ${(order.customerName || order.mobileNumber) ? `<div style="font-size:var(--fs-xs); color:var(--clr-text-secondary); margin-bottom:var(--sp-2);">👤 ${order.customerName || 'Guest'} (${order.mobileNumber || ''})</div>` : ''}
+            ${order.notes ? `<div style="font-size:var(--fs-xs); color:var(--clr-text-muted); font-style:italic; margin-bottom:var(--sp-3);"><i class="fa-solid fa-file-signature"></i> ${order.notes}</div>` : ''}
+            ${isCancelled && order.cancel_reason ? `
+              <div style="font-size:var(--fs-xs); color:var(--clr-error); margin-bottom:var(--sp-2); display:flex; align-items:center; gap:var(--sp-1);">
+                <i class="fa-solid fa-ban"></i> Cancelled: ${order.cancel_reason}
+                ${order.cancelled_by ? ` by ${order.cancelled_by}` : ''}
+              </div>` : ''}
+            <div class="order-card-footer">
+              <div>
+                <div class="order-card-total">${formatPrice(order.total)}</div>
+                <div class="order-card-time">${formatTime(order.timestamp)}</div>
+              </div>
+              <div class="order-card-actions">
+                ${isCancelled
+                  ? '<span class="cancelled-badge"><i class="fa-solid fa-ban"></i> Cancelled</span>'
+                  : `<span class="badge badge--${getStatusBadge(order.status)}">${order.status}</span>`
+                }
+                ${adminRole !== CONFIG.ROLES.KITCHEN ? nextStatuses.map(s => `
+                  <button class="btn btn--sm ${s === 'Rejected' ? 'btn--ghost' : 'btn--primary'} status-btn"
+                          data-order="${order.orderId}" data-status="${s}"
+                          style="${s === 'Rejected' ? 'color:var(--clr-error);' : ''}">
+                    ${s === 'Rejected' ? '✖ Reject' : s}
+                  </button>
+                `).join('') : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach status update listeners
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const orderId = btn.dataset.order;
+          const newStatus = btn.dataset.status;
+          
+          setButtonLoading(btn, true, '...');
+
+          try {
+            await API.updateOrderStatus(orderId, newStatus);
+            showToast(`Order ${orderId} → ${newStatus}`, 'success');
+            await loadOrders();
+          } catch (err) {
+            showToast('Failed to update status.', 'error');
+            setButtonLoading(btn, false);
+          }
+        });
+      });
+
+      // Attach cancel trigger listeners
+      document.querySelectorAll('.cancel-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const order = {
+            orderId: btn.dataset.orderId,
+            status: btn.dataset.orderStatus,
+            table: btn.dataset.orderTable,
+            total: btn.dataset.orderTotal,
+          };
+          CancellationEngine.openDialog(order, adminRole, async (result) => {
+            showToast(`Order #${result.orderId} cancelled.`, 'error');
+            await loadOrders();
+          });
+        });
+      });
+    }
+
+    function getStatusBadge(status) {
+      const map = { 'New': 'info', 'Accepted': 'primary', 'Preparing': 'warning', 'Ready': 'success', 'Delivered': 'success', 'Paid': 'success', 'Rejected': 'error', 'Cancelled': 'error' };
+      return map[status] || 'info';
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Event Listeners Ã¢â€â‚¬Ã¢â€â‚¬
+    function setupEventListeners() {
+      // Filter tabs
+      filterTabs.addEventListener('click', (e) => {
+        const tab = e.target.closest('.filter-tab');
+        if (!tab) return;
+
+        filterTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.status;
+        renderOrders();
+      });
+
+      // Sidebar
+      const sidebar = document.getElementById('sidebar');
+      const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+      function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        sidebarBackdrop.classList.toggle('active');
+      }
+      document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
+      sidebarBackdrop.addEventListener('click', toggleSidebar);
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        sessionStorage.clear();
+        window.location.href = '../login/';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../../sw.js', { scope: '../../' })
+          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+          .catch(err => console.log('Service Worker registration failed.', err));
+      });
+    }
+  </script>
+<script src="../../js/notifications.js"></script>
+</body>
+</html>
+
+

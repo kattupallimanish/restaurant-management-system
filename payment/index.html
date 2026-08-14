@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Secure payment for your WIN Restaurant order.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Payment — WIN Restaurant</title>
+
+  <!-- PWA -->
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WIN Restaurant">
+  <link rel="apple-touch-icon" href="../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Lightweight QR code generator (no external canvas lib) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+  <!-- Confetti canvas -->
+  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></canvas>
+
+  <div class="payment-page">
+    <div class="payment-container">
+
+      <!-- Back link -->
+      <div class="payment-back-link" id="back-link" onclick="history.back()" role="button" tabindex="0">
+        <i class="fa-solid fa-arrow-left"></i> Back to Order
+      </div>
+
+      <!-- Loading state -->
+      <div id="payment-loading" style="display:flex; flex-direction:column; align-items:center; padding: var(--sp-20) 0; gap: var(--sp-4);">
+        <div class="spinner spinner--lg"></div>
+        <p style="color: var(--clr-text-muted);">Loading payment details...</p>
+      </div>
+
+      <!-- Main payment content -->
+      <div id="payment-content" style="display:none; flex-direction:column; gap: var(--sp-4);">
+
+        <!-- Invoice Header (rendered by PaymentEngine.renderInvoiceHeader) -->
+        <div id="invoice-display"></div>
+
+        <!-- Payment Status Display -->
+        <div id="payment-status-display" class="payment-status-display awaiting">
+          <span class="payment-status-icon"><i class="fa-solid fa-hourglass-half"></i></span>
+          <div>
+            <div style="font-weight: var(--fw-bold);">Awaiting Payment</div>
+            <div style="font-size: var(--fs-xs); opacity: 0.8;">Please select a payment method below</div>
+          </div>
+        </div>
+
+        <!-- ── Payment Method Selection ── -->
+        <div class="payment-method-section">
+          <div class="payment-section-title">
+            <i class="fa-solid fa-wallet" style="color: var(--clr-primary);"></i>
+            Choose Payment Method
+          </div>
+          <div class="payment-method-grid">
+
+            <!-- UPI Card -->
+            <div class="payment-method-card" id="pm-upi-card"
+                 onclick="PaymentEngine.selectUpi()"
+                 role="button" tabindex="0"
+                 aria-label="Pay via UPI">
+              <div class="payment-method-check">
+                <i class="fa-solid fa-check" style="font-size:0.6rem;"></i>
+              </div>
+              <div class="payment-method-icon upi">📱</div>
+              <div class="payment-method-name">Pay via UPI</div>
+              <div class="payment-method-desc">Google Pay, PhonePe, Paytm, BHIM &amp; more</div>
+            </div>
+
+            <!-- Cash Card -->
+            <div class="payment-method-card" id="pm-cash-card"
+                 onclick="PaymentEngine.selectCash()"
+                 role="button" tabindex="0"
+                 aria-label="Pay cash at counter">
+              <div class="payment-method-check">
+                <i class="fa-solid fa-check" style="font-size:0.6rem;"></i>
+              </div>
+              <div class="payment-method-icon cash">💵</div>
+              <div class="payment-method-name">Cash at Counter</div>
+              <div class="payment-method-desc">Pay directly to the cashier</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── UPI Panel ── -->
+        <div class="upi-panel" id="upi-panel" aria-live="polite">
+          <div class="payment-section-title">
+            <i class="fa-solid fa-qrcode" style="color: var(--clr-primary);"></i>
+            UPI Payment
+          </div>
+
+          <!-- Deep Link Button (Visible on all devices now) -->
+          <a href="#" id="upi-mobile-btn" class="upi-pay-btn" style="display:flex;" rel="noopener noreferrer" onclick="setButtonLoading(this, true, 'Opening UPI App...'); setTimeout(() => setButtonLoading(this, false), 4000);">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            Open UPI App &amp; Pay Now
+          </a>
+
+          <!-- Payment note -->
+          <div class="payment-note">
+            <strong>Payment Reference / Note</strong>
+            <span id="upi-payment-note">Loading...</span>
+          </div>
+
+          <!-- Supported UPI Apps -->
+          <div class="upi-apps-supported">
+            <span class="upi-apps-label">Supported apps:</span>
+            <span class="upi-app-chip">📱 Google Pay</span>
+            <span class="upi-app-chip">📱 PhonePe</span>
+            <span class="upi-app-chip">📱 Paytm</span>
+            <span class="upi-app-chip">📱 BHIM</span>
+            <span class="upi-app-chip">📱 Any UPI App</span>
+          </div>
+
+          <!-- Polling indicator -->
+          <div class="polling-indicator">
+            <span style="width:6px;height:6px;background:var(--clr-success);border-radius:50%;animation:pulse 2s infinite;display:inline-block;"></span>
+            Waiting for payment confirmation automatically…
+          </div>
+        </div>
+
+        <!-- ── Cash Panel ── -->
+        <div class="cash-panel" id="cash-panel">
+          <div class="payment-section-title">
+            <i class="fa-solid fa-money-bill-wave" style="color: var(--clr-success);"></i>
+            Cash Payment at Counter
+          </div>
+
+          <div class="cash-info-grid">
+            <div class="cash-info-item">
+              <div class="cash-info-label">Invoice No</div>
+              <div class="cash-info-value" id="cash-invoice-no"
+                   style="font-size: var(--fs-xs); font-family: monospace; color: var(--clr-primary-300);">—</div>
+            </div>
+            <div class="cash-info-item">
+              <div class="cash-info-label">Order No</div>
+              <div class="cash-info-value" id="cash-order-no">—</div>
+            </div>
+            <div class="cash-info-item">
+              <div class="cash-info-label">Amount Due</div>
+              <div class="cash-info-value" id="cash-amount"
+                   style="color: var(--clr-primary); font-size: var(--fs-xl);">—</div>
+            </div>
+            <div class="cash-info-item">
+              <div class="cash-info-label">Method</div>
+              <div class="cash-info-value">💵 Cash</div>
+            </div>
+          </div>
+
+          <div class="payment-status-display cash">
+            <span class="payment-status-icon"><i class="fa-solid fa-money-bill-wave"></i></span>
+            <div>
+              <div style="font-weight: var(--fw-bold);">Awaiting Cash Payment</div>
+              <div style="font-size: var(--fs-xs); opacity: 0.8;">Please show this screen to the cashier</div>
+            </div>
+          </div>
+
+          <p style="font-size: var(--fs-sm); color: var(--clr-text-secondary); text-align:center; margin: var(--sp-3) 0; line-height: var(--lh-relaxed);">
+            Show your invoice number to the cashier at the counter, or tap the button below to alert them.
+          </p>
+
+          <button class="notify-cashier-btn" id="notify-cashier-btn" onclick="PaymentEngine.notifyCashier()">
+            <i class="fa-solid fa-bell"></i> Notify Cashier
+          </button>
+        </div>
+
+        <!-- ── Receipt (shown after successful payment) ── -->
+        <div class="receipt-card" id="receipt-card"></div>
+
+        <!-- Order Status link -->
+        <a id="view-order-btn" href="../order-status/" class="btn btn--outline btn--full">
+          <i class="fa-solid fa-receipt"></i> View Order Status
+        </a>
+
+      </div><!-- /#payment-content -->
+    </div><!-- /.payment-container -->
+  </div><!-- /.payment-page -->
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/payment.js"></script>
+  <script>
+    /* ── Confetti (reused across pages) ── */
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const particles = [];
+      const colors = ['#e8a317', '#ef4444', '#22c55e', '#3b82f6', '#a855f7', '#f97316'];
+      for (let i = 0; i < 180; i++) {
+        particles.push({
+          x: canvas.width / 2, y: canvas.height / 3,
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.8) * 14,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 3,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 12,
+          gravity: 0.15 + Math.random() * 0.12,
+          opacity: 1,
+        });
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
+          p.rotation += p.rotSpeed; p.opacity -= 0.008;
+          if (p.opacity > 0) {
+            alive = true;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.globalAlpha = p.opacity;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            ctx.restore();
+          }
+        });
+        if (alive) requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    /* ── Update order-status back link ── */
+    const params = new URLSearchParams(window.location.search);
+    const oid = params.get('id') || localStorage.getItem(CONFIG.STORAGE_KEYS.LAST_ORDER);
+    if (oid) {
+      const viewBtn = document.getElementById('view-order-btn');
+      if (viewBtn) viewBtn.href = `../order-status/?id=${oid}`;
+    }
+
+    /* ── Keyboard accessibility for payment method cards ── */
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    /* ── Boot ── */
+    document.addEventListener('DOMContentLoaded', () => {
+      PaymentEngine.initPaymentPage();
+    });
+  </script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../sw.js', { scope: '../' })
+          .catch(err => console.warn('SW reg failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

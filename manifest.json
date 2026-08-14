@@ -1,0 +1,24 @@
+{
+  "name": "WIN Cafe Management System",
+  "short_name": "WIN Cafe",
+  "description": "Win Cafe Management System.",
+  "start_url": "./admin/login/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0e1017",
+  "theme_color": "#0e1017",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

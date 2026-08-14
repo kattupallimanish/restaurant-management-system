@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Offline — No Internet</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--clr-bg-primary);
+      text-align: center;
+      padding: var(--sp-6);
+    }
+    
+    .offline-icon {
+      font-size: 5rem;
+      color: var(--clr-primary);
+      margin-bottom: var(--sp-4);
+      filter: drop-shadow(0 0 20px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.4));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: var(--fs-2xl);
+      margin-bottom: var(--sp-2);
+      color: var(--clr-text-primary);
+    }
+
+    p {
+      color: var(--clr-text-secondary);
+      font-size: var(--fs-md);
+      margin-bottom: var(--sp-6);
+      max-width: 400px;
+      line-height: var(--lh-relaxed);
+    }
+
+    .btn-retry {
+      padding: var(--sp-3) var(--sp-6);
+      font-size: var(--fs-base);
+      font-weight: var(--fw-bold);
+      background: linear-gradient(135deg, var(--clr-primary-400), var(--clr-primary));
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      transition: all var(--transition-base);
+    }
+
+    .btn-retry:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+    
+    .btn-retry:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+
+  <div style="position: relative; width: 100px; height: 100px; margin-bottom: var(--sp-4); display: flex; align-items: center; justify-content: center; animation: float 3s ease-in-out infinite;">
+    <i class="fa-solid fa-wifi" style="font-size: 5rem; color: var(--clr-primary); opacity: 0.5; filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.4));"></i>
+    <i class="fa-solid fa-slash" style="font-size: 6rem; color: var(--clr-error); position: absolute; opacity: 0.9;"></i>
+  </div>
+  
+  <h1>You are Offline</h1>
+  <p>It seems you've lost your internet connection. Please check your network and try again so we can load your delicious menu.</p>
+  
+  <button class="btn-retry" onclick="window.location.reload();">
+    <i class="fa-solid fa-rotate-right"></i> Tap to Retry
+  </button>
+
+</body>
+</html>

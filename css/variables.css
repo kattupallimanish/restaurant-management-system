@@ -1,0 +1,150 @@
+/* ============================================
+   DESIGN TOKENS — Restaurant QR Ordering System
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&display=swap');
+
+:root {
+  /* ── Color Palette ── */
+  /* Primary: Warm amber/gold — appetizing & premium */
+  --clr-primary-50: hsl(36, 100%, 95%);
+  --clr-primary-100: hsl(36, 100%, 88%);
+  --clr-primary-200: hsl(36, 100%, 78%);
+  --clr-primary-300: hsl(36, 95%, 65%);
+  --clr-primary-400: hsl(36, 95%, 55%);
+  --clr-primary: hsl(36, 95%, 50%);
+  --clr-primary-600: hsl(30, 90%, 42%);
+  --clr-primary-700: hsl(25, 85%, 35%);
+
+  /* Accent: Coral/Red for CTAs */
+  --clr-accent: hsl(4, 85%, 60%);
+  --clr-accent-hover: hsl(4, 85%, 52%);
+  --clr-accent-light: hsl(4, 85%, 95%);
+
+  /* Success / Warning / Error */
+  --clr-success: hsl(152, 70%, 45%);
+  --clr-success-bg: hsl(152, 70%, 95%);
+  --clr-warning: hsl(45, 100%, 50%);
+  --clr-warning-bg: hsl(45, 100%, 95%);
+  --clr-error: hsl(0, 75%, 55%);
+  --clr-error-bg: hsl(0, 75%, 95%);
+  --clr-info: hsl(210, 80%, 55%);
+  --clr-info-bg: hsl(210, 80%, 95%);
+
+  /* Neutrals (Dark Mode First) */
+  --clr-bg-primary: hsl(220, 20%, 6%);
+  --clr-bg-secondary: hsl(220, 18%, 10%);
+  --clr-bg-card: hsl(220, 16%, 13%);
+  --clr-bg-elevated: hsl(220, 14%, 16%);
+  --clr-bg-hover: hsl(220, 14%, 19%);
+  --clr-bg-glass: hsla(220, 16%, 13%, 0.7);
+
+  --clr-border: hsl(220, 12%, 20%);
+  --clr-border-light: hsl(220, 12%, 25%);
+
+  --clr-text-primary: hsl(0, 0%, 95%);
+  --clr-text-secondary: hsl(0, 0%, 65%);
+  --clr-text-muted: hsl(0, 0%, 45%);
+  --clr-text-inverse: hsl(220, 20%, 6%);
+
+  /* ── Typography ── */
+  --font-heading: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  --fs-xs: 0.75rem;
+  /* 12px */
+  --fs-sm: 0.8125rem;
+  /* 13px */
+  --fs-base: 0.9375rem;
+  /* 15px */
+  --fs-md: 1rem;
+  /* 16px */
+  --fs-lg: 1.125rem;
+  /* 18px */
+  --fs-xl: 1.25rem;
+  /* 20px */
+  --fs-2xl: 1.5rem;
+  /* 24px */
+  --fs-3xl: 1.875rem;
+  /* 30px */
+  --fs-4xl: 2.25rem;
+  /* 36px */
+  --fs-5xl: 3rem;
+  /* 48px */
+
+  --fw-light: 300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+
+  --lh-tight: 1.2;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.7;
+
+  /* ── Spacing (4px base) ── */
+  --sp-1: 0.25rem;
+  /* 4px */
+  --sp-2: 0.5rem;
+  /* 8px */
+  --sp-3: 0.75rem;
+  /* 12px */
+  --sp-4: 1rem;
+  /* 16px */
+  --sp-5: 1.25rem;
+  /* 20px */
+  --sp-6: 1.5rem;
+  /* 24px */
+  --sp-8: 2rem;
+  /* 32px */
+  --sp-10: 2.5rem;
+  /* 40px */
+  --sp-12: 3rem;
+  /* 48px */
+  --sp-16: 4rem;
+  /* 64px */
+  --sp-20: 5rem;
+  /* 80px */
+
+  /* ── Border Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.3);
+  --shadow-md: 0 4px 12px hsla(0, 0%, 0%, 0.3);
+  --shadow-lg: 0 8px 24px hsla(0, 0%, 0%, 0.35);
+  --shadow-xl: 0 12px 48px hsla(0, 0%, 0%, 0.4);
+  --shadow-glow: 0 0 20px hsla(36, 95%, 50%, 0.3);
+  --shadow-glow-accent: 0 0 20px hsla(4, 85%, 60%, 0.3);
+
+  /* Glass effect */
+  --glass-bg: hsla(220, 16%, 13%, 0.6);
+  --glass-border: hsla(220, 12%, 30%, 0.4);
+  --glass-blur: blur(20px);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 350ms ease;
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-index Scale ── */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* ── Container ── */
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+}

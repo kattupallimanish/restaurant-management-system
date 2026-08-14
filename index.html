@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Scan QR code to order food from your table or choose takeaway. Fast, contactless dining.">
+  <meta name="theme-color" content="#0f1117">
+  <title>WIN Restaurant</title>
+
+  <!-- PWA Meta Tags & Manifest -->
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WIN Restaurant">
+  <link rel="apple-touch-icon" href="icons/icon-512.png">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .landing {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--sp-8);
+      background: radial-gradient(ellipse at center, var(--clr-bg-secondary) 0%, var(--clr-bg-primary) 70%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative circles */
+    .landing::before,
+    .landing::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.08;
+    }
+
+    .landing::before {
+      width: 600px;
+      height: 600px;
+      background: var(--clr-primary);
+      top: -200px;
+      right: -200px;
+    }
+
+    .landing::after {
+      width: 400px;
+      height: 400px;
+      background: var(--clr-accent);
+      bottom: -150px;
+      left: -150px;
+    }
+
+    .landing-logo {
+      font-size: 4rem;
+      margin-bottom: var(--sp-2);
+      animation: bounce 2s ease infinite;
+      z-index: 2;
+    }
+
+    .landing h1 {
+      font-size: var(--fs-4xl);
+      margin-bottom: var(--sp-2);
+      background: linear-gradient(135deg, var(--clr-primary-300), var(--clr-primary), var(--clr-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      z-index: 2;
+    }
+
+    .landing-subtitle {
+      font-size: var(--fs-lg);
+      color: var(--clr-text-secondary);
+      margin-bottom: var(--sp-4);
+      max-width: 450px;
+      z-index: 2;
+    }
+
+    /* Choice Grid & Cards */
+    .choice-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin-top: var(--sp-4);
+      margin-bottom: var(--sp-8);
+      z-index: 2;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-5);
+      width: 100%;
+    }
+
+    @media (max-width: 576px) {
+      .choice-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-4);
+      }
+    }
+
+    .choice-card {
+      background: var(--clr-bg-card);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-8) var(--sp-5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choice-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      transition: background var(--transition-base);
+    }
+
+    .choice-card:hover {
+      border-color: var(--clr-primary);
+      box-shadow: var(--shadow-glow);
+      transform: translateY(-4px);
+    }
+
+    .choice-card.dine-in:hover::before {
+      background: linear-gradient(90deg, var(--clr-primary), var(--clr-accent));
+    }
+
+    .choice-card.takeaway:hover::before {
+      background: linear-gradient(90deg, var(--clr-accent), var(--clr-primary));
+    }
+
+    .choice-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--sp-4);
+      height: 70px;
+      width: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--clr-bg-secondary);
+      border-radius: var(--radius-full);
+      color: var(--clr-primary-400);
+      border: 1px solid var(--clr-border);
+      transition: all var(--transition-base);
+    }
+
+    .choice-card:hover .choice-icon {
+      background: var(--clr-primary-50);
+      color: var(--clr-primary-700);
+      border-color: var(--clr-primary-200);
+      transform: scale(1.08);
+    }
+
+    .choice-card.takeaway:hover .choice-icon {
+      background: var(--clr-accent-light);
+      color: var(--clr-accent);
+      border-color: var(--clr-accent-light);
+    }
+
+    .choice-title {
+      font-size: var(--fs-xl);
+      font-weight: var(--fw-bold);
+      margin-bottom: var(--sp-2);
+      color: var(--clr-text-primary);
+    }
+
+    .choice-desc {
+      font-size: var(--fs-sm);
+      color: var(--clr-text-secondary);
+      line-height: var(--lh-normal);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: hsla(220, 20%, 6%, 0.8);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .table-modal {
+      background: var(--clr-bg-card);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-6) var(--sp-6) var(--sp-6);
+      max-width: 440px;
+      width: 90%;
+      box-shadow: var(--shadow-xl);
+      transform: scale(0.95);
+      transition: transform var(--transition-spring);
+      position: relative;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    .modal-overlay.active .table-modal {
+      transform: scale(1);
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: var(--sp-4);
+      right: var(--sp-4);
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--clr-text-muted);
+      cursor: pointer;
+      transition: color var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      z-index: 10;
+    }
+
+    .close-modal-btn:hover {
+      color: var(--clr-text-primary);
+    }
+
+    /* Search input styling */
+    .search-input-wrapper {
+      position: relative;
+      margin-bottom: var(--sp-4);
+    }
+
+    .search-input-wrapper .search-icon {
+      position: absolute;
+      left: var(--sp-3.5);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-text-muted);
+    }
+
+    .search-input-wrapper .form-input {
+      padding-left: var(--sp-10);
+      background: var(--clr-bg-secondary);
+      border-color: var(--clr-border);
+    }
+
+    /* Scrollable table grid */
+    .table-scroll-container {
+      overflow-y: auto;
+      margin-bottom: var(--sp-4);
+      padding-right: var(--sp-1);
+      flex-grow: 1;
+      max-height: 240px;
+    }
+
+    .table-options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-2.5);
+    }
+
+    .table-cell {
+      background: var(--clr-bg-secondary);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-4) var(--sp-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--fw-bold);
+      color: var(--clr-text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      min-height: 72px;
+      font-size: var(--fs-sm);
+    }
+
+    .table-cell i {
+      font-size: 1.15rem;
+      margin-bottom: var(--sp-1.5);
+      color: var(--clr-text-muted);
+      transition: color var(--transition-fast);
+    }
+
+    .table-cell:hover {
+      border-color: var(--clr-primary-400);
+      background: var(--clr-bg-hover);
+    }
+
+    .table-cell:hover i {
+      color: var(--clr-primary-400);
+    }
+
+    .table-cell.selected {
+      background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-600));
+      color: var(--clr-text-inverse);
+      border-color: var(--clr-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .table-cell.selected i {
+      color: var(--clr-text-inverse);
+    }
+
+    .table-grid-empty {
+      text-align: center;
+      padding: var(--sp-6) 0;
+      color: var(--clr-text-muted);
+      font-size: var(--fs-sm);
+      grid-column: 1 / -1;
+    }
+
+    /* Staff Footer styling */
+    .staff-footer {
+      margin-top: auto;
+      display: flex;
+      gap: var(--sp-6);
+      font-size: var(--fs-xs);
+      color: var(--clr-text-muted);
+      z-index: 2;
+      padding-top: var(--sp-4);
+    }
+
+    .staff-footer a {
+      color: var(--clr-text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1.5);
+      transition: color var(--transition-fast);
+    }
+
+    .staff-footer a:hover {
+      color: var(--clr-primary-400);
+    }
+
+    .landing-redirect {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      color: var(--clr-text-muted);
+      font-size: var(--fs-sm);
+      margin-top: var(--sp-6);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="landing">
+    <div class="landing-logo">🍽️</div>
+    <h1>WIN Restaurant</h1>
+    <p class="landing-subtitle">Welcome! Please select your ordering preference to begin.</p>
+
+    <!-- Dine In or Take Away Choice UI -->
+    <div class="choice-container">
+      <div class="choice-grid">
+        <div class="choice-card dine-in" id="btn-dine-in">
+          <div class="choice-icon">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <h3 class="choice-title">Dine In</h3>
+          <p class="choice-desc">Order from one of our <span id="dine-in-table-count">10</span> tables and get served
+            fresh & hot directly to you.</p>
+        </div>
+
+        <div class="choice-card takeaway" id="btn-takeaway">
+          <div class="choice-icon">
+            <i class="fa-solid fa-bag-shopping"></i>
+          </div>
+          <h3 class="choice-title">Take Away</h3>
+          <p class="choice-desc">Order ahead for pickup and enjoy your food wherever you go.</p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="landing-redirect" id="redirect-msg" style="display: none;">
+      <div class="spinner spinner--sm"></div>
+      <span>Redirecting to menu...</span>
+    </div>
+  </div>
+
+  <!-- Table Selection Modal (MFA version for more tables) -->
+  <div class="modal-overlay" id="table-modal-overlay">
+    <div class="table-modal">
+      <button class="close-modal-btn" id="close-modal-btn">✕</button>
+      <h3 style="font-size: var(--fs-lg); margin-bottom: var(--sp-1);"><i class="fa-solid fa-chair"
+          style="color: var(--clr-primary);"></i> Select Your Table</h3>
+      <p style="font-size: var(--fs-xs); color: var(--clr-text-secondary); margin-bottom: var(--sp-4);">Please choose
+        your table from the <span id="modal-table-count">10</span> tables below or search to proceed.</p>
+
+      <!-- Search & Input Box -->
+      <div class="search-input-wrapper">
+        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <input type="text" class="form-input" id="table-search-input" placeholder="Search or enter table number...">
+      </div>
+
+      <!-- Scrollable Grid -->
+      <div class="table-scroll-container">
+        <div class="table-options-grid" id="modal-tables-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Confirmation CTA -->
+      <button class="btn btn--primary btn--full btn--md" id="btn-confirm-table" style="margin-top: auto;">
+        Confirm Table & Order
+      </button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // 1. Check if ?t= or ?table= query parameter is in URL (QR code scanned)
+    const params = new URLSearchParams(window.location.search);
+    const table = params.get('t') || params.get('table');
+    if (table) {
+      document.getElementById('redirect-msg').style.display = 'flex';
+      // Hide the choice UI while redirecting
+      document.querySelector('.choice-container').style.display = 'none';
+      setTimeout(() => {
+        window.location.href = `menu/?t=${encodeURIComponent(table)}`;
+      }, 800);
+    }
+
+    // 2. Dynamic Tables List Loader (Real-time Config from Sheets API)
+    let tablesList = [];
+
+    async function loadTablesList() {
+      let numTables = 10;
+      try {
+        const config = await API.getConfig();
+        if (config && config.num_tables) {
+          numTables = parseInt(config.num_tables) || 10;
+        }
+        if (typeof window.applyBrandSettings === 'function') {
+          window.applyBrandSettings();
+        }
+      } catch (e) {
+        console.warn('Could not load configuration dynamically, falling back to 10:', e);
+      }
+
+      // Populate table data
+      tablesList = Array.from({ length: numTables }, (_, i) => {
+        const id = String(i + 1);
+        return { id };
+      });
+
+      // Update count text in UI
+      const cardCountEl = document.getElementById('dine-in-table-count');
+      const modalCountEl = document.getElementById('modal-table-count');
+      if (cardCountEl) cardCountEl.textContent = numTables;
+      if (modalCountEl) modalCountEl.textContent = numTables;
+
+      renderTablesGrid();
+    }
+
+    // 3. Setup UI Controls
+    const btnDineIn = document.getElementById('btn-dine-in');
+    const btnTakeaway = document.getElementById('btn-takeaway');
+    const tableModalOverlay = document.getElementById('table-modal-overlay');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const tableSearchInput = document.getElementById('table-search-input');
+    const btnConfirmTable = document.getElementById('btn-confirm-table');
+    const tablesGrid = document.getElementById('modal-tables-grid');
+
+    let selectedTableNum = '';
+    let searchQuery = '';
+
+    // Render Table Grid function
+    function renderTablesGrid() {
+      tablesGrid.innerHTML = '';
+
+      const filtered = tablesList.filter(t => {
+        return t.id.includes(searchQuery);
+      });
+
+      if (filtered.length === 0) {
+        tablesGrid.innerHTML = `<div class="table-grid-empty">No tables match your search.</div>`;
+        return;
+      }
+
+      filtered.forEach(t => {
+        const isSelected = (selectedTableNum === t.id);
+        const cell = document.createElement('div');
+        cell.className = `table-cell ${isSelected ? 'selected' : ''}`;
+        cell.dataset.table = t.id;
+        cell.innerHTML = `
+          <i class="fa-solid fa-chair"></i>
+          <span>Table ${t.id}</span>
+        `;
+
+        cell.addEventListener('click', () => {
+          document.querySelectorAll('.table-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          selectedTableNum = t.id;
+          tableSearchInput.value = `Table ${t.id}`;
+        });
+
+        tablesGrid.appendChild(cell);
+      });
+    }
+
+    // Search / Custom Input typing
+    tableSearchInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      // Remove text prefix like "table " if present
+      const cleanVal = val.replace(/^table\s+/, '');
+
+      searchQuery = cleanVal;
+      renderTablesGrid();
+
+      // If user typed an exact table number, select it
+      const exactMatch = tablesList.find(t => t.id === cleanVal);
+      if (exactMatch) {
+        selectedTableNum = exactMatch.id;
+        // Re-render to show selected table highlighted
+        renderTablesGrid();
+      } else {
+        selectedTableNum = cleanVal; // Keep what they typed as manual input (e.g. T45 or custom)
+      }
+    });
+
+    // Takeaway click
+    btnTakeaway.addEventListener('click', () => {
+      window.location.href = 'menu/?t=Takeaway';
+    });
+
+    // Dine In click -> Open Table Modal
+    btnDineIn.addEventListener('click', () => {
+      const lastTable = localStorage.getItem('qr_order_table');
+      if (lastTable && lastTable.toLowerCase() !== 'takeaway') {
+        selectedTableNum = lastTable;
+        tableSearchInput.value = `Table ${lastTable}`;
+      } else {
+        selectedTableNum = '';
+        tableSearchInput.value = '';
+      }
+      searchQuery = '';
+
+      renderTablesGrid();
+      tableModalOverlay.classList.add('active');
+
+      // Scroll selected table into view if exists
+      setTimeout(() => {
+        if (selectedTableNum) {
+          const selectedCell = tablesGrid.querySelector(`.table-cell[data-table="${selectedTableNum}"]`);
+          if (selectedCell) {
+            selectedCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }, 150);
+    });
+
+    // Close Modal
+    closeModalBtn.addEventListener('click', () => {
+      tableModalOverlay.classList.remove('active');
+    });
+
+    tableModalOverlay.addEventListener('click', (e) => {
+      if (e.target === tableModalOverlay) {
+        tableModalOverlay.classList.remove('active');
+      }
+    });
+
+    // Confirm selection
+    btnConfirmTable.addEventListener('click', () => {
+      let finalTableVal = selectedTableNum;
+
+      // Fallback to text box content if grid has no selection
+      if (!finalTableVal) {
+        const rawInput = tableSearchInput.value.trim();
+        finalTableVal = rawInput.replace(/^table\s+/i, '');
+      }
+
+      function showError(msg) {
+        let errEl = document.getElementById('custom-alert');
+        if (!errEl) {
+          errEl = document.createElement('div');
+          errEl.id = 'custom-alert';
+          errEl.style.position = 'fixed';
+          errEl.style.top = '20px';
+          errEl.style.left = '50%';
+          errEl.style.transform = 'translateX(-50%)';
+          errEl.style.background = 'var(--clr-error)';
+          errEl.style.color = '#fff';
+          errEl.style.padding = '12px 24px';
+          errEl.style.borderRadius = 'var(--radius-full)';
+          errEl.style.boxShadow = '0 10px 25px rgba(239,68,68,0.4)';
+          errEl.style.zIndex = '9999';
+          errEl.style.fontWeight = 'bold';
+          errEl.style.transition = 'opacity 0.3s ease';
+          document.body.appendChild(errEl);
+        }
+        errEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`;
+        errEl.style.opacity = '1';
+        setTimeout(() => { errEl.style.opacity = '0'; }, 4000);
+      }
+
+      if (!finalTableVal) {
+        showError('Please select or enter a table number.');
+        return;
+      }
+
+      // Validate that the table number is within the range 1 to n
+      const tableNumInt = parseInt(finalTableVal);
+      if (isNaN(tableNumInt) || tableNumInt < 1 || tableNumInt > tablesList.length) {
+        showError(`Please enter a valid table number between 1 and ${tablesList.length}.`);
+        return;
+      }
+
+      tableModalOverlay.classList.remove('active');
+      document.getElementById('redirect-msg').style.display = 'flex';
+      setTimeout(() => {
+        window.location.href = `menu/?t=${encodeURIComponent(finalTableVal)}`;
+      }, 500);
+    });
+
+    // Run initialization to load real-time configuration
+    loadTablesList();
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+          .catch(err => console.log('Service Worker registration failed.', err));
+      });
+    }
+  </script>
+</body>
+
+</html>

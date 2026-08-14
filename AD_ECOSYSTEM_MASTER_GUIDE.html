@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Ordering Ad Ecosystem — Master Administration Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --font-heading: 'Outfit', sans-serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --clr-bg: #f8fafc;
+      --clr-card: #ffffff;
+      --clr-border: #e2e8f0;
+      --clr-primary: #ff6b6b;
+      --clr-accent: #d97706;
+      --clr-success: #059669;
+      --clr-text-primary: #0f172a;
+      --clr-text-secondary: #334155;
+      --clr-text-muted: #64748b;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--clr-bg);
+      color: var(--clr-text-secondary);
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Glassmorphism Panel style */
+    .glass-card {
+      background: var(--clr-card);
+      border: 1px solid var(--clr-border);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-heading);
+      color: var(--clr-text-primary);
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--clr-text-primary), var(--clr-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--clr-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      border-bottom: 1px solid var(--clr-border);
+      padding-bottom: 10px;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 i {
+      color: var(--clr-primary);
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-top: 24px;
+      color: var(--clr-text-primary);
+    }
+
+    p {
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--clr-accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    /* Premium styled tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--clr-border);
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: rgba(0, 0, 0, 0.02);
+      color: var(--clr-text-primary);
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: rgba(0, 0, 0, 0.01);
+    }
+
+    /* Formulas & Callouts */
+    .formula {
+      background: rgba(217, 119, 6, 0.04);
+      border-left: 4px solid var(--clr-accent);
+      padding: 20px;
+      margin: 20px 0;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: var(--clr-text-primary);
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-placement {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--clr-primary);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .status-active {
+      color: var(--clr-success);
+      font-weight: bold;
+    }
+
+    .status-inactive {
+      color: var(--clr-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-card">
+    <h1><i class="fa-solid fa-rectangle-ad"></i> QR Ad Ecosystem</h1>
+    <div class="subtitle">Master Management & Configuration Guide</div>
+    <p>This guide explains how to control, activate, target, and rank/prioritize ads served on client phones directly from your Google Sheets dashboard.</p>
+  </div>
+
+  <h2><i class="fa-solid fa-power-off"></i> 1. Activating and Deactivating Ads</h2>
+  <p>Inside the Google Sheet tab named <strong>"AdCampaigns"</strong>, there is a dedicated column titled <code>Status</code>. You can instantly control whether an ad is eligible to serve by modifying this field:</p>
+  <ul>
+    <li>Set to <span class="status-active">ACTIVE</span>: The ad is enabled and will be considered for display based on user traffic and bids.</li>
+    <li>Set to <span class="status-inactive">INACTIVE</span>: The ad is instantly disabled and will not show on any screens.</li>
+  </ul>
+
+  <h2><i class="fa-solid fa-map-pin"></i> 2. Setting Where Ads Display (Placements)</h2>
+  <p>You can target an ad campaign to show on one or more screens by writing the appropriate keywords into the <code>Placements</code> column in the Google Sheet. You can specify multiple screens by separating them with a comma (e.g. <code>menu_landing, order_tracking</code>).</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Sheet Keyword</th>
+        <th>Visual Placement Screen</th>
+        <th>Ideal Advertisers & Design Style</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>menu_landing</code></td>
+        <td>Top of the Food Menu (Horizontal carousel)</td>
+        <td>High-priority premium recommendations (Gyms, Salons, Real Estate).</td>
+      </tr>
+      <tr>
+        <td><code>inline</code></td>
+        <td>Native list position inside Category grids</td>
+        <td>Local partner businesses relevant to user browsing.</td>
+      </tr>
+      <tr>
+        <td><code>cart_empty</code></td>
+        <td>Bottom Cart drawer before items are added</td>
+        <td>Benefits/Vouchers, encouraging dining additions or local experiences.</td>
+      </tr>
+      <tr>
+        <td><code>order_tracking</code></td>
+        <td>Halfway down the order preparation screen</td>
+        <td>High dwell time recommendations (Local cinemas, spas).</td>
+      </tr>
+      <tr>
+        <td><code>bill</code></td>
+        <td>Underneath the digital receipt upon delivery</td>
+        <td>Next-destination services (Lounges, cab booking, local pubs).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2><i class="fa-solid fa-arrow-up-wide-short"></i> 3. Ad Ranking & Prioritization (How Ads are Filtered)</h2>
+  <p>To maximize advertising revenue and trust, ads are prioritized using an **eCPM (expected Cost Per Mille)** yield optimization score. The engine calculates priority using this formula:</p>
+  
+  <div class="formula">
+    <span>eCPM = (Bid CPC * Historical CTR) * 1000</span>
+    <i class="fa-solid fa-chart-line" style="color: var(--clr-accent); font-size: 1.5rem;"></i>
+  </div>
+
+  <p>Where:</p>
+  <ul>
+    <li><strong>Bid CPC</strong>: The amount the advertiser pays per click (configured in the <code>Bid CPC</code> sheet column).</li>
+    <li><strong>Historical CTR (Click-Through Rate)</strong>: Calculated dynamically as <code>Clicks / Impressions</code> from the logged analytics.</li>
+  </ul>
+  
+  <h3>💡 Optimization Rules:</h3>
+  <ol>
+    <li><strong>Higher Bids = Higher Rank</strong>: An ad with a higher CPC bid will display more frequently.</li>
+    <li><strong>Higher Engagement = Higher Rank</strong>: If users click an ad often (high CTR), the system ranks it higher since it provides more revenue per impression.</li>
+    <li><strong>Exploration Phase</strong>: Newly added ads are given a temporary engagement bonus to collect baseline stats before competing strictly on eCPM yield.</li>
+  </ol>
+
+  <h2><i class="fa-solid fa-circle-info"></i> 4. Best Practices</h2>
+  <ul>
+    <li>Ensure your Image URLs link directly to high-resolution, fast-loading images (Unsplash links or secure cloud links work great).</li>
+    <li>Write headlines that emphasize the **benefit** (e.g. <code>🎁 7 Day Free Trial</code>) to capture higher CTR and rank.</li>
+  </ul>
+
+</body>
+</html>

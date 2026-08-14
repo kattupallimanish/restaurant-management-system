@@ -1,0 +1,622 @@
+/* ============================================
+   Ad Ecosystem - Premium Redesigned UI Styles
+   ============================================ */
+
+/* ── Modern Premium CSS Variables ── */
+:root {
+  --ad-glow-primary: rgba(245, 158, 11, 0.25);
+  --ad-glow-accent: rgba(255, 107, 107, 0.2);
+  --ad-glass-bg: rgba(30, 41, 59, 0.7);
+  --ad-glass-border: rgba(255, 255, 255, 0.08);
+  --ad-font-heading: var(--font-heading, inherit);
+  --ad-radius-lg: 24px;
+  --ad-radius-md: 16px;
+  --ad-radius-sm: 10px;
+}
+
+/* ── General Animations ── */
+@keyframes adGlowPulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--ad-glass-border); }
+  50% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 15px var(--ad-glow-primary), 0 0 0 1px rgba(245, 158, 11, 0.3); }
+}
+
+@keyframes adShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes adFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Reusable Ad Carousel Component ── */
+.ad-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--sp-6);
+  padding: 0 var(--sp-4);
+  box-sizing: border-box;
+}
+
+.ad-carousel-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE/Edge */
+  gap: 16px;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.ad-carousel-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.ad-carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: center;
+  box-sizing: border-box;
+  display: block;
+}
+
+/* Pagination Dots */
+.ad-carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ad-carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--clr-border, #334155);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.ad-carousel-dot.active {
+  width: 16px;
+  border-radius: 8px;
+  background: var(--clr-primary, #ff6b6b);
+  box-shadow: 0 0 8px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.5);
+}
+
+/* ── AdDiscoveryCard Component (Airbnb/Google Recommendations style) ── */
+.ad-discovery-card {
+  background: var(--ad-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ad-glass-border);
+  border-radius: var(--ad-radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: adFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ad-discovery-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.15);
+}
+
+.ad-discovery-card-header {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 180px;
+  border-radius: var(--ad-radius-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+.ad-discovery-card-img {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ad-discovery-card:hover .ad-discovery-card-img {
+  transform: scale(1.06);
+}
+
+/* Floating Badges */
+.ad-badge-top-left {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--clr-primary-300, #ff8e53);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--ad-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ad-badge-top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, var(--clr-primary, #ff6b6b), var(--clr-accent, #ff8e53));
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--ad-radius-sm);
+  box-shadow: 0 4px 10px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+}
+
+.ad-discovery-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  color: var(--clr-text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.ad-discovery-rating {
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ad-discovery-card-title {
+  font-family: var(--ad-font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--clr-text-primary, #fff);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.ad-discovery-card-desc {
+  font-size: 0.82rem;
+  color: var(--clr-text-secondary, #cbd5e1);
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+
+.ad-discovery-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.ad-discovery-advertiser {
+  font-size: 0.7rem;
+  color: var(--clr-text-muted, #64748b);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ad-discovery-cta {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--clr-text-primary, #fff);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ad-discovery-card:hover .ad-discovery-cta {
+  background: var(--clr-primary, #ff6b6b);
+  border-color: var(--clr-primary, #ff6b6b);
+  box-shadow: 0 4px 12px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+  transform: translateY(-1px);
+}
+
+/* ── AdRewardCard Component (Empty Cart / Sleek Banner) ── */
+.ad-reward-card {
+  margin: 16px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(245, 158, 11, 0.08));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--ad-radius-md);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ad-reward-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.2);
+}
+
+.ad-reward-img-wrapper {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--ad-radius-md);
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ad-reward-content {
+  flex: 1;
+  text-align: left;
+}
+
+.ad-reward-badge {
+  display: inline-block;
+  color: #f59e0b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.ad-reward-headline {
+  font-family: var(--ad-font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 2px 0;
+}
+
+.ad-reward-subtext {
+  font-size: 0.75rem;
+  color: var(--clr-text-secondary, #cbd5e1);
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ad-reward-arrow {
+  color: #f59e0b;
+  font-size: 1.1rem;
+  opacity: 0.8;
+  transition: transform 0.3s ease;
+}
+
+.ad-reward-card:hover .ad-reward-arrow {
+  transform: translateX(4px);
+}
+
+/* ── AdPremiumBanner Component (Hero tracking banner) ── */
+.ad-premium-banner {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid var(--clr-primary);
+  border-radius: var(--ad-radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.15);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: var(--sp-4) 0;
+  text-align: left;
+}
+
+.ad-premium-banner-img {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--ad-radius-md);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.ad-premium-banner-info {
+  flex: 1;
+}
+
+.ad-premium-banner-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--clr-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 4px;
+}
+
+.ad-premium-banner-title {
+  font-family: var(--ad-font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px 0;
+}
+
+.ad-premium-banner-desc {
+  font-size: 0.78rem;
+  color: var(--clr-text-secondary, #cbd5e1);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.ad-premium-banner-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--clr-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.ad-premium-banner:hover .ad-premium-banner-arrow {
+  transform: translateX(4px);
+  background: var(--clr-primary-400);
+}
+
+/* ── Premium AdPartnerCard (Inline Menu Feed Ad) ── */
+.ad-partner-card-premium {
+  background: var(--ad-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ad-glass-border);
+  border-radius: var(--ad-radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--sp-4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.ad-partner-card-premium:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.15);
+}
+
+.ad-partner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ad-partner-advertiser {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ad-partner-advertiser::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: var(--clr-primary);
+  border-radius: 50%;
+}
+
+.ad-partner-sponsor-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--clr-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ad-partner-media {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.ad-partner-overlay {
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.6) 50%, transparent 100%);
+  width: 100%;
+  padding: 40px 16px 16px 16px;
+}
+
+.ad-partner-title-large {
+  font-family: var(--ad-font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+.ad-partner-desc-large {
+  font-size: 0.85rem;
+  color: var(--clr-text-secondary, #cbd5e1);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ad-partner-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ad-partner-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--clr-text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.ad-partner-meta i {
+  color: #f59e0b;
+}
+
+.ad-partner-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--clr-text-primary, #fff);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ad-partner-card-premium:hover .ad-partner-btn {
+  background: var(--clr-primary, #ff6b6b);
+  border-color: var(--clr-primary, #ff6b6b);
+  box-shadow: 0 4px 12px rgba(var(--clr-primary-rgb, 255, 107, 107), 0.3);
+}
+
+@media (max-width: 480px) {
+  .ad-partner-media {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ── AdSkeletonLoader Component (Shimmer loading state) ── */
+.ad-skeleton-loader {
+  background: var(--ad-glass-bg);
+  border: 1px solid var(--ad-glass-border);
+  border-radius: var(--ad-radius-lg);
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ad-skeleton-img {
+  width: 100%;
+  height: 140px;
+  border-radius: var(--ad-radius-md);
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: adShimmer 1.5s infinite;
+  margin-bottom: 12px;
+}
+
+.ad-skeleton-text {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: adShimmer 1.5s infinite;
+  margin-bottom: 8px;
+}
+
+.ad-skeleton-text.title { width: 60%; height: 18px; margin-bottom: 12px; }
+.ad-skeleton-text.sub { width: 85%; }
+.ad-skeleton-text.cta { width: 30%; height: 32px; border-radius: 12px; margin-left: auto; margin-top: 8px; }
+
+/* ── Mobile-First Responsive Overrides ── */
+@media (max-width: 480px) {
+  .ad-carousel-wrapper {
+    padding: 0 var(--sp-3);
+  }
+  .ad-discovery-card {
+    padding: 12px;
+    border-radius: var(--ad-radius-md);
+  }
+  .ad-discovery-card-header {
+    height: 120px;
+    border-radius: var(--ad-radius-sm);
+  }
+  .ad-discovery-card-title {
+    font-size: 1rem;
+  }
+  .ad-discovery-card-desc {
+    font-size: 0.76rem;
+    margin-bottom: 10px;
+  }
+  .ad-discovery-cta {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+  .ad-reward-card {
+    padding: 16px;
+    border-radius: var(--ad-radius-md);
+  }
+  .ad-reward-headline {
+    font-size: 1.15rem;
+  }
+  .ad-reward-subtext {
+    font-size: 0.78rem;
+  }
+  .ad-reward-cta {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+  .ad-premium-banner {
+    padding: 14px;
+    gap: 12px;
+  }
+  .ad-premium-banner-img {
+    width: 60px;
+    height: 60px;
+  }
+  .ad-premium-banner-title {
+    font-size: 0.95rem;
+  }
+  .ad-premium-banner-desc {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 350px) {
+  .ad-discovery-card-header {
+    height: 100px;
+  }
+  .ad-discovery-card-title {
+    font-size: 0.9rem;
+  }
+  .ad-discovery-card-desc {
+    font-size: 0.72rem;
+  }
+  .ad-premium-banner-img {
+    display: none;
+  }
+}

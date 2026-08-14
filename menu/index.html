@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Browse our delicious menu and order directly from your table. Fast, contactless dining experience.">
+  <meta name="theme-color" content="#0f1117">
+  <title>Menu — WIN Restaurant</title>
+
+  <!-- PWA Meta Tags & Manifest -->
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WIN Restaurant">
+  <link rel="apple-touch-icon" href="../icons/icon-512.png">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/menu.css">
+  <link rel="stylesheet" href="../css/ads.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Active Order Tracking Banner -->
+  <div class="active-order-banner" id="active-order-banner" style="display: none;">
+    <span><i class="fa-regular fa-clock"></i> Active Order <strong id="active-order-id">ORD-XXX</strong> is in progress!</span>
+    <a href="#" id="active-order-link" class="active-order-link">Track Status <i class="fa-solid fa-arrow-right"></i></a>
+  </div>
+
+  <!-- Header -->
+  <header class="menu-header" id="menu-header">
+    <div class="menu-header-inner">
+      <div class="menu-header-left">
+        <span class="restaurant-name" id="restaurant-name">Loading...</span>
+        <span class="table-badge" id="table-badge">Table —</span>
+      </div>
+      <div style="display: flex; gap: var(--sp-3); align-items: center;">
+        <button id="call-waiter-btn" class="btn btn--primary btn--sm" style="display: none; border-radius: var(--radius-full); padding: 0 var(--sp-3); height: 40px;">
+          <i class="fa-solid fa-bell"></i> Call Waiter
+        </button>
+        <button class="cart-btn" id="cart-btn" aria-label="Open Cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <div class="search-input-wrapper">
+      <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+      <input type="text" class="search-input" id="search-input" placeholder="Search for dishes...">
+    </div>
+  </div>
+
+  <!-- Category Tabs -->
+  <nav class="category-tabs" id="category-tabs">
+    <div class="category-tabs-inner" id="category-tabs-inner">
+      <!-- Tabs injected by JS -->
+    </div>
+  </nav>
+
+  <!-- Menu Section -->
+  <main class="menu-section" id="menu-section">
+    <!-- Loading Skeletons -->
+    <div id="menu-loading" class="stagger">
+      <div class="menu-item-skeleton">
+        <div class="skeleton skeleton-img"></div>
+        <div style="flex:1">
+          <div class="skeleton skeleton-text w-75"></div>
+          <div class="skeleton skeleton-text w-50"></div>
+          <div class="skeleton skeleton-text w-25" style="margin-top: 16px;"></div>
+        </div>
+      </div>
+      <div class="menu-item-skeleton" style="margin-top: 16px;">
+        <div class="skeleton skeleton-img"></div>
+        <div style="flex:1">
+          <div class="skeleton skeleton-text w-75"></div>
+          <div class="skeleton skeleton-text w-50"></div>
+          <div class="skeleton skeleton-text w-25" style="margin-top: 16px;"></div>
+        </div>
+      </div>
+      <div class="menu-item-skeleton" style="margin-top: 16px;">
+        <div class="skeleton skeleton-img"></div>
+        <div style="flex:1">
+          <div class="skeleton skeleton-text w-75"></div>
+          <div class="skeleton skeleton-text w-50"></div>
+          <div class="skeleton skeleton-text w-25" style="margin-top: 16px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu items rendered here -->
+    <div id="menu-container" style="display: none;"></div>
+
+    <!-- Empty state -->
+    <div id="menu-empty" class="empty-state" style="display: none;">
+      <div class="empty-state-icon"><i class="fa-solid fa-utensils"></i></div>
+      <h3>No items found</h3>
+      <p>Try a different search or category</p>
+    </div>
+  </main>
+
+  <!-- Sticky Cart Bar -->
+  <div class="cart-bar" id="cart-bar">
+    <div class="cart-bar-inner">
+      <div class="cart-bar-info">
+        <span class="cart-bar-items" id="cart-bar-items">0 items</span>
+        <span class="cart-bar-total" id="cart-bar-total">₹0</span>
+      </div>
+      <button class="view-cart-btn" id="view-cart-btn">
+        View Cart →
+      </button>
+    </div>
+  </div>
+
+  <!-- Cart Drawer (Bottom Sheet) -->
+  <div class="modal-backdrop" id="cart-backdrop"></div>
+  <div class="drawer" id="cart-drawer">
+    <div class="drawer-handle"></div>
+    <div class="cart-drawer">
+      <div class="cart-drawer-header">
+        <h3><i class="fa-solid fa-cart-shopping"></i> Your Order</h3>
+        <button class="modal-close" id="cart-close">✕</button>
+      </div>
+
+      <div class="cart-items" id="cart-items">
+        <!-- Cart items rendered by JS -->
+      </div>
+
+      <div class="cart-summary" id="cart-summary">
+        <div class="cart-summary-row">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">₹0</span>
+        </div>
+        <div class="cart-summary-row total">
+          <span>Total</span>
+          <span id="cart-total">₹0</span>
+        </div>
+      </div>
+
+      <div class="cart-customer-details" style="display:flex; flex-direction:column; gap:var(--sp-3); margin-top:var(--sp-4); margin-bottom:var(--sp-4); padding-bottom:var(--sp-4); border-bottom:1px solid var(--clr-border);">
+        <h4 style="font-family:var(--font-body); font-weight:var(--fw-bold); font-size:var(--fs-xs); color:var(--clr-text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin:0 0 var(--sp-1);">Customer Info (Session only)</h4>
+        <div class="form-group">
+          <label class="form-label" for="customer-name" style="font-size:var(--fs-xs);">Name</label>
+          <input type="text" class="form-input" id="customer-name" placeholder="Enter your name" style="padding:var(--sp-2) var(--sp-3); font-size:var(--fs-sm);" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="customer-phone" style="font-size:var(--fs-xs);">Mobile Number</label>
+          <input type="tel" class="form-input" id="customer-phone" placeholder="10-digit mobile number" style="padding:var(--sp-2) var(--sp-3); font-size:var(--fs-sm);" required pattern="[0-9]{10}">
+        </div>
+      </div>
+
+      <div class="cart-notes">
+        <label for="order-notes">Special instructions (optional)</label>
+        <textarea id="order-notes" placeholder="e.g. Extra cheese, no onions..."></textarea>
+      </div>
+
+      <button class="btn btn--accent btn--full btn--lg" id="place-order-btn">
+        <i class="fa-solid fa-utensils"></i> Place Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="order-loading" style="display: none;">
+    <div class="spinner spinner--lg"></div>
+    <p>Placing your order...</p>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/ads.js"></script>
+  <script src="../js/menu.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../sw.js', { scope: '../' })
+          .then(reg => console.log('Service Worker registered successfully.', reg.scope))
+          .catch(err => console.log('Service Worker registration failed.', err));
+      });
+    }
+  </script>
+</body>
+</html>
