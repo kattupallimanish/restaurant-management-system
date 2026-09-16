@@ -4,7 +4,7 @@
 
 const CONFIG = {
   // Replace this with your deployed Google Apps Script URL
-  API_URL: 'https://script.google.com/macros/s/AKfycbzEoHAebn_ezMYBqbK_0SszyHRvJZJHBz2jMvuHd9KtywOA_aEaZLY4R3ggMjGohzwi/exec',
+  API_URL: '',
 
   // Polling interval for kitchen/order status (ms)
   // Changed back to 5000 for faster updates
